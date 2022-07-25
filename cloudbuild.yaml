@@ -66,10 +66,10 @@ steps:
       echo "*************** TERRAFOM PLAN ******************"
       cd terraform
       terraform plan -no-color \
-        -var='project_name="$_PROJECT_NAME"' \
-        -var='org_id="$_ORG_ID"' \
-        -var='billing_account="$_BILLING_ACCOUNT"' \
-        -var='folder_id=$_FOLDER_ID"' \
+        -var='project_name=$_PROJECT_NAME' \
+        -var='org_id=$_ORG_ID' \
+        -var='billing_account=$_BILLING_ACCOUNT' \
+        -var='folder_id=$_FOLDER_ID' \
       || exit 1
 # [END tf-plan]
 
@@ -83,8 +83,8 @@ steps:
       echo "*************** TERRAFOM APPLY ******************"
       cd terraform
       terraform apply -auto-approve -no-color \
-          -var='project_name="$_PROJECT_NAME"' \
-          -var='org_id="$_ORG_ID"' \
-          -var='billing_account="$_BILLING_ACCOUNT"' \
-          -var='folder_id=$_FOLDER_ID"' \
+          -var='project_name=$_PROJECT_NAME' \
+          -var='org_id=$_ORG_ID' \
+          -var='billing_account=$_BILLING_ACCOUNT' \
+          -var='folder_id=$_FOLDER_ID'
 # [END tf-apply]  
