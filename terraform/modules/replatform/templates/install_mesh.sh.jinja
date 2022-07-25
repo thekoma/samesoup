@@ -1,0 +1,27 @@
+#!/bin/bash
+TMPDIR=$(mktemp -d)
+OUTDIR=$(mktemp -d)
+
+INSTALL_ASM=${TMPDIR}/install_asm
+curl https://storage.googleapis.com/csm-artifacts/asm/install_asm_1.10 > $INSTALL_ASM
+chmod +x $INSTALL_ASM
+
+
+./install_asm \
+  --project_id PROJECT_ID \
+  --cluster_name CLUSTER_NAME \
+  --cluster_location CLUSTER_LOCATION \
+  --mode install \
+  --output_dir ${OUTDIR} \
+  --only_validate
+
+
+
+rm -fr ${TMPDIR} ${OUTDIR}
+./install_asm \
+  --project_id potato-05a0 \
+  --cluster_name cluster-bnrk9 \
+  --cluster_location us-central1 \
+  --mode install \
+  --output_dir ./asm \
+  -e
