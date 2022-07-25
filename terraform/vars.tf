@@ -33,6 +33,10 @@ variable "region" {
   default = "us-central1"
 }
 
+variable "location" {
+  type     = string
+  default = "US"
+}
 
 variable "zones" {
   type    = list(string)
