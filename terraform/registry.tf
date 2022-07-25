@@ -3,7 +3,7 @@ resource "google_artifact_registry_repository" "demo-repo" {
   depends_on    = [module.enabled_google_apis]
   provider      = google-beta
   location      = var.region
-  repository_id = "asm-demo"
+  repository_id = module.project-factory.project_name
   description   = "Demo Registry"
   format        = "DOCKER"
 }
