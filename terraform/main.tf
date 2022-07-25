@@ -1,10 +1,10 @@
 provider "google" {
-  credentials = "./credentials.json"
+  credentials = fileexists(var.gcp_creds) ? var.gcp_creds : null
   region      = var.region
 }
 
 provider "google-beta" {
-  credentials = "./credentials.json"
+  credentials = fileexists(var.gcp_creds) ? var.gcp_creds : null
   region      = var.region
 }
 

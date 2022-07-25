@@ -91,3 +91,9 @@ locals {
   name_suffix = "${random_string.suffix.result}"
   cloudrun_revision_name = "cloud-run"
 }
+
+
+variable "gcp_creds" {
+  type     = string
+  default = "./credentials.json"
+}
