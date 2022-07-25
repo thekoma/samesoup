@@ -48,6 +48,7 @@ steps:
   - |
       echo ""
       echo "*************** TERRAFORM INIT ******************"
+      cd terraform
       terraform init \
         -var='project_name="$_PROJECT_NAME"' \
         -var='org_id="$_ORG_ID"' \
@@ -62,6 +63,7 @@ steps:
   - '-c'
   - | 
       echo "*************** TERRAFOM PLAN ******************"
+      cd terraform
       terraform plan \
         -var='project_name="$_PROJECT_NAME"' \
         -var='org_id="$_ORG_ID"' \
@@ -76,7 +78,9 @@ steps:
   entrypoint: 'sh'
   args: 
   - '-c'
-  - |     
+  - | 
+      echo "*************** TERRAFOM APPLY ******************"
+      cd terraform
       terraform apply -auto-approve \
           -var='project_name="$_PROJECT_NAME"' \
           -var='org_id="$_ORG_ID"' \
