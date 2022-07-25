@@ -8,7 +8,7 @@
 To run this project you will need to set the following vars in a cloudbuild (or manually):
 
 | Required | Terraform Name| Cloudbuild Name  | Example Value | Description |
-|---|---|---|---|---|
+|:---:|---|---|---|---|
 | ✅ | billing_account | _BILLING_ACCOUNT | 01234A-0995B9-1FACB1  | Billing account required to create the project |
 | ✅ | org_id | _ORG_ID | 1234543452 | The Organization ID of the project |
 | ✅ | project_name | _PROJECT_NAME | samesoup | The Name of the project (It doesn't need to be unique) |
