@@ -50,7 +50,7 @@ steps:
       echo ""
       echo "*************** TERRAFORM INIT ******************"
       cd terraform
-      terraform init \
+      terraform init -no-color \
         -var='project_name="$_PROJECT_NAME"' \
         -var='org_id="$_ORG_ID"' \
         -var='billing_account="$_BILLING_ACCOUNT"' \
@@ -65,7 +65,7 @@ steps:
   - | 
       echo "*************** TERRAFOM PLAN ******************"
       cd terraform
-      terraform plan \
+      terraform plan -no-color \
         -var='project_name="$_PROJECT_NAME"' \
         -var='org_id="$_ORG_ID"' \
         -var='billing_account="$_BILLING_ACCOUNT"' \
@@ -82,7 +82,7 @@ steps:
   - | 
       echo "*************** TERRAFOM APPLY ******************"
       cd terraform
-      terraform apply -auto-approve \
+      terraform apply -auto-approve -no-color \
           -var='project_name="$_PROJECT_NAME"' \
           -var='org_id="$_ORG_ID"' \
           -var='billing_account="$_BILLING_ACCOUNT"' \
