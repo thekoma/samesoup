@@ -1,2 +1,2 @@
 FROM php:apache-bullseye  
-COPY site/public/* /var/www/html/
+COPY public/* /var/www/html/
