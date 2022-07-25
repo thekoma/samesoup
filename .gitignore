@@ -16,3 +16,4 @@ terraform/.terraform.tfstate.lock.info
 frontend/src/__pycache__
 utils/services-generator/modules
 terraform/tfstate.tf
+terraform/backend.tf

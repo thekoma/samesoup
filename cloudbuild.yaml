@@ -23,63 +23,49 @@ steps:
       echo "***********************"
       echo "$BRANCH_NAME"
       echo "***********************"
+- id: 'prepare backend settings'
+  name: 'alpine'
+  entrypoint: 'sh'  
+  args: 
+  - '-c'
+  - | 
+      cd terraform
+      cat <<EOF > backend.tf
+        terraform {
+          backend "gcs" {
+            bucket  = "$_TFSTATE_BUCKET"
+            prefix  = "terraform/state-$PROJECT_ID"
+          }
+        }
+      EOF
 - id: 'tf init'
-  name: 'hashicorp/terraform:1.0.0'
+  name: 'hashicorp/terraform:latest'
   entrypoint: 'sh'
   args: 
   - '-c'
   - |
-      if [ -d "environments/$BRANCH_NAME/" ]; then
-        cd environments/$BRANCH_NAME
-        terraform init
-      else
-        for dir in environments/*/
-        do 
-          cd ${dir}   
-          env=${dir%*/}
-          env=${env#*/}
-          echo ""
-          echo "*************** TERRAFORM INIT ******************"
-          echo "******* At environment: ${env} ********"
-          echo "*************************************************"
-          terraform init \
-            -var='project_name="$PROJECT_NAME"' \
-            -var='org_id="$ORG_ID"' \
-            -var='billing_account="$BILLING_ACCOUNT"' \
-            -var='folder_id=$FOLDER_ID"' \
-          || exit 1
-          cd ../../
-        done
-      fi 
+      echo ""
+      echo "*************** TERRAFORM INIT ******************"
+      terraform init \
+        -var='project_name="$PROJECT_NAME"' \
+        -var='org_id="$ORG_ID"' \
+        -var='billing_account="$BILLING_ACCOUNT"' \
+        -var='folder_id=$FOLDER_ID"' \
+      || exit 1
 # [START tf-plan]
 - id: 'tf plan'
-  name: 'hashicorp/terraform:1.0.0'
+  name: 'hashicorp/terraform:latest'
   entrypoint: 'sh'
   args: 
   - '-c'
   - | 
-      if [ -d "environments/$BRANCH_NAME/" ]; then
-        cd environments/$BRANCH_NAME
-        terraform plan
-      else
-        for dir in environments/*/
-        do 
-          cd ${dir}   
-          env=${dir%*/}
-          env=${env#*/}  
-          echo ""
-          echo "*************** TERRAFOM PLAN ******************"
-          echo "******* At environment: ${env} ********"
-          echo "*************************************************"
-          terraform plan \
-            -var='project_name="$PROJECT_NAME"' \
-            -var='org_id="$ORG_ID"' \
-            -var='billing_account="$BILLING_ACCOUNT"' \
-            -var='folder_id=$FOLDER_ID"' \
-          || exit 1
-          cd ../../
-        done
-      fi 
+      echo "*************** TERRAFOM PLAN ******************"
+      terraform plan \
+        -var='project_name="$PROJECT_NAME"' \
+        -var='org_id="$ORG_ID"' \
+        -var='billing_account="$BILLING_ACCOUNT"' \
+        -var='folder_id=$FOLDER_ID"' \
+      || exit 1
 # [END tf-plan]
 
 # [START tf-apply]
@@ -88,17 +74,10 @@ steps:
   entrypoint: 'sh'
   args: 
   - '-c'
-  - | 
-      if [ -d "environments/$BRANCH_NAME/" ]; then
-        cd environments/$BRANCH_NAME      
-        terraform apply -auto-approve \
-            -var='project_name="$PROJECT_NAME"' \
-            -var='org_id="$ORG_ID"' \
-            -var='billing_account="$BILLING_ACCOUNT"' \
-            -var='folder_id=$FOLDER_ID"' \
-      else
-        echo "***************************** SKIPPING APPLYING *******************************"
-        echo "Branch '$BRANCH_NAME' does not represent an oficial environment."
-        echo "*******************************************************************************"
-      fi
+  - |     
+      terraform apply -auto-approve \
+          -var='project_name="$_PROJECT_NAME"' \
+          -var='org_id="$_ORG_ID"' \
+          -var='billing_account="$_BILLING_ACCOUNT"' \
+          -var='folder_id=$_FOLDER_ID"' \
 # [END tf-apply]  
