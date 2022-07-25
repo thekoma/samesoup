@@ -7,10 +7,6 @@ provider "google-beta" {
   credentials = fileexists(var.gcp_creds) ? var.gcp_creds : null
   region      = var.region
 }
-
-
-
-
 module "project-factory" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 13.0.0"
@@ -24,3 +20,4 @@ module "project-factory" {
   ]
   auto_create_network = true
 }
+
