@@ -24,6 +24,6 @@ module "project-factory" {
 module "rehost" {
   source = "./modules/rehost"
   network_name = var.network_name
+  primary-zone = var.primary-zone
   subnetwork = var.subnetwork
-  zones = [ "value" ]
 }
