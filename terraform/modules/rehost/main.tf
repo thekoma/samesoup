@@ -1,7 +1,8 @@
 resource "google_compute_instance" "rehost" {
-  name         = "rehost"
-  machine_type = "e2-medium"
-  zone        = var.primary-zone
+  name          = "rehost"
+  machine_type  = "e2-medium"
+  zone          = var.primary-zone
+  project       = var.project_id
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"

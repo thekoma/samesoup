@@ -34,6 +34,9 @@ variable "primary-zone" {
 
 variable "subnet_ip" {
   type     = string
-  default = "10.0.0.0/17"
 }
 
+variable "project_id" {
+  type     = string
+  nullable = false
+}

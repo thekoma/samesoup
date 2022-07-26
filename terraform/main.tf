@@ -23,7 +23,8 @@ module "project-factory" {
 
 module "rehost" {
   source = "./modules/rehost"
-  network_name = var.network_name
-  primary-zone = var.primary-zone
-  subnetwork = var.subnetwork
+  network_name  = var.network_name
+  primary-zone  = var.primary-zone
+  subnetwork    = var.subnetwork
+  project_id    = module.project-factory.project_id
 }
