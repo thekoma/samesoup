@@ -21,3 +21,9 @@ module "project-factory" {
   auto_create_network = true
 }
 
+module "rehost" {
+  source = "./modules/rehost"
+  network_name = var.network_name
+  subnetwork = var.subnetwork
+  zones = [ "value" ]
+}
