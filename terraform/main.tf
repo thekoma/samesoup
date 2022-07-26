@@ -26,5 +26,6 @@ module "rehost" {
   network_name  = var.network_name
   primary-zone  = var.primary-zone
   subnetwork    = var.subnetwork
+  subnet_ip     = var.subnet_ip
   project_id    = module.project-factory.project_id
 }
