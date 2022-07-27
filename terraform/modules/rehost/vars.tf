@@ -1,6 +1,5 @@
-variable "network_name" {
+variable "network" {
   type     = string
-  default = "default"
 }
 
 variable "subnetwork" {
@@ -39,4 +38,13 @@ variable "subnet_ip" {
 variable "project_id" {
   type     = string
   nullable = false
+}
+
+variable "tags" {
+  type     = list(string)
+  default = [
+    "ssh",
+    "http",
+    "https"
+  ]
 }

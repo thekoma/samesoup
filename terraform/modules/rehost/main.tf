@@ -9,8 +9,12 @@ resource "google_compute_instance" "rehost" {
     }
   }
   network_interface {
-    network     = var.network_name
+    network     = var.network
     subnetwork  = var.subnetwork
+    access_config {
+      // Ephemeral public IP
+    }
   }
   metadata_startup_script = "echo hi > /test.txt"
+  tags = var.tags
 }

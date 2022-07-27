@@ -23,9 +23,10 @@ module "project-factory" {
 
 module "rehost" {
   source = "./modules/rehost"
-  network_name  = var.network_name
+  network  = module.gcp-network.network_id
   primary-zone  = var.primary-zone
-  subnetwork    = var.subnetwork
+  subnetwork    = module.gcp-network.subnets_ids[0]
   subnet_ip     = var.subnet_ip
   project_id    = module.project-factory.project_id
+  tags          = ["ssh","http","https"]
 }
