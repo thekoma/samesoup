@@ -7,6 +7,14 @@ variable "subnetwork" {
   default = "default"
 }
 
+
+
+variable "service_account_id" {
+  type     = string
+  nullable = false
+}
+
+
 variable "region" {
   type     = string
   default = "us-central1"

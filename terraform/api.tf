@@ -6,7 +6,9 @@ module "enabled_google_apis" {
   disable_services_on_destroy = false
 
   activate_apis = [
+    "servicenetworking.googleapis.com",
     "compute.googleapis.com",
+    "secretmanager.googleapis.com",
     "container.googleapis.com",
     "gkehub.googleapis.com",
     "anthosconfigmanagement.googleapis.com",

@@ -61,3 +61,51 @@ resource "google_compute_router_nat" "nat" {
     filter = "ERRORS_ONLY"
   }
 }
+
+# data "google_compute_network" "subnet-vm" {
+#   project             = module.project-factory.project_id
+#   name = var.network_name
+# }
+
+# resource "google_compute_global_address" "private_ip_address" {
+#   # provider      = google-beta
+#   project       = module.project-factory.project_id
+#   name          = "private-ip-address"
+#   purpose       = "VPC_PEERING"
+#   address_type  = "INTERNAL"
+#   prefix_length = 16
+#   network       = data.google_compute_network.subnet-vm.id
+# }
+
+# resource "google_service_networking_connection" "private_vpc_connection" {
+#   # provider = google-beta
+#   network                 = data.google_compute_network.subnet-vm.id
+#   service                 = "servicenetworking.googleapis.com"
+#   reserved_peering_ranges = [ google_compute_global_address.private_ip_address.name ]
+# }
+
+# resource "random_id" "db_name_suffix" {
+#   byte_length = 4
+# }
+
+
+
+resource "google_compute_network" "peering_network" {
+  name = "peering-network"
+  project       = module.project-factory.project_id
+}
+
+resource "google_compute_global_address" "private_ip_alloc" {
+  project       = module.project-factory.project_id
+  name          = "private-ip-alloc"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.peering_network.id
+}
+
+resource "google_service_networking_connection" "foobar" {
+  network                 = google_compute_network.peering_network.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip_alloc.name]
+}

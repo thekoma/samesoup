@@ -22,11 +22,24 @@ module "project-factory" {
 }
 
 module "rehost" {
-  source = "./modules/rehost"
-  network  = module.gcp-network.network_id
-  primary-zone  = var.primary-zone
-  subnetwork    = module.gcp-network.subnets_ids[0]
-  subnet_ip     = var.subnet_ip
-  project_id    = module.project-factory.project_id
-  tags          = ["ssh","http","https"]
+  source              = "./modules/rehost"
+  network             = module.gcp-network.network_id
+  primary-zone        = var.primary-zone
+  subnetwork          = module.gcp-network.subnets_ids[0]
+  subnet_ip           = var.subnet_ip
+  project_id          = module.project-factory.project_id
+  tags                = ["ssh","http","https"]
+  service_account_id  = google_service_account.rehost.id
+}
+module "replatform" {
+  source                  = "./modules/replatform"
+  network_name            = module.gcp-network.network_name
+  primary-zone            = var.primary-zone
+  subnetwork_name         = module.gcp-network.subnets_names[0]
+  subnet_ip               = var.subnet_ip
+  project_id              = module.project-factory.project_id
+  ip_range_pods_name      = var.ip_range_pods_name
+  ip_range_services_name  = var.ip_range_services_name
+  gke_cluster_name        = "replatform"
+  # depends_on        = [module.enabled_google_apis]
 }

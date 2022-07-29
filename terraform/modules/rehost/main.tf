@@ -1,11 +1,21 @@
+data "google_service_account" "rehost" {
+  account_id = var.service_account_id
+}
+
 resource "google_compute_instance" "rehost" {
   name          = "rehost"
   machine_type  = "e2-medium"
   zone          = var.primary-zone
   project       = var.project_id
+  allow_stopping_for_update = true
+  service_account {
+    email  = data.google_service_account.rehost.email
+    scopes = ["compute-ro", "storage-rw", "logging-write", "monitoring-write", "service-control", "service-management", "pubsub", "trace", "cloud-platform"]
+  }
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"
+      size = "100"
     }
   }
   network_interface {
