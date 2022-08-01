@@ -1,7 +1,7 @@
 resource "google_compute_firewall" "enable_iap" {
   project     = module.project-factory.project_id
   name        = "permit-iap"
-  network     = module.gcp-network.network_id
+  network     = google_compute_network.main-network.id
   description = "Permit SSH and RDP to hosts via IAP"
 
   allow {
@@ -15,7 +15,7 @@ resource "google_compute_firewall" "enable_iap" {
 resource "google_compute_firewall" "enable_http_https" {
   project     = module.project-factory.project_id
   name        = "permit-http-https"
-  network     = module.gcp-network.network_id
+  network     = google_compute_network.main-network.id
   description = "Permit HTTP/S to hosts"
 
   allow {
@@ -29,7 +29,7 @@ resource "google_compute_firewall" "enable_http_https" {
 resource "google_compute_firewall" "google_probes" {
   project     = module.project-factory.project_id
   name        = "permit-google-probes"
-  network     = module.gcp-network.network_id
+  network     = google_compute_network.main-network.id
   description = "Permit HTTP/S to hosts"
   allow {
     protocol  = "all"

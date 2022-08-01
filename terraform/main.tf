@@ -23,23 +23,31 @@ module "project-factory" {
 
 module "rehost" {
   source              = "./modules/rehost"
-  network             = module.gcp-network.network_id
-  primary-zone        = var.primary-zone
-  subnetwork          = module.gcp-network.subnets_ids[0]
-  subnet_ip           = var.subnet_ip
   project_id          = module.project-factory.project_id
+  network             = google_compute_network.main-network.id
+  subnetwork          = data.google_compute_subnetwork.sub_nat_net.id
+  primary-zone        = var.primary-zone
   tags                = ["ssh","http","https"]
   service_account_id  = google_service_account.rehost.id
 }
 module "replatform" {
   source                  = "./modules/replatform"
-  network_name            = module.gcp-network.network_name
+  network_name            = var.network_name
   primary-zone            = var.primary-zone
-  subnetwork_name         = module.gcp-network.subnets_names[0]
-  subnet_ip               = var.subnet_ip
   project_id              = module.project-factory.project_id
   ip_range_pods_name      = var.ip_range_pods_name
   ip_range_services_name  = var.ip_range_services_name
   gke_cluster_name        = "replatform"
   # depends_on        = [module.enabled_google_apis]
+}
+
+
+
+module "dns" {
+  source              = "./modules/dns"
+  project_id          = var.dns_project_id # The name of the project that manages the zone
+  prefix_name         = var.project_name   # This will be used to create the zone prefix
+  dns_zone            = var.dns_zone
+  rehost_endpoint     = module.rehost.instance_ip_addr
+  # replatform_endpoint =
 }

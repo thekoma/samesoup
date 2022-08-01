@@ -7,8 +7,6 @@ variable "subnetwork" {
   default = "default"
 }
 
-
-
 variable "service_account_id" {
   type     = string
   nullable = false
@@ -37,10 +35,6 @@ variable "zones" {
 variable "primary-zone" {
   type    = string
   default = "us-central1-a"
-}
-
-variable "subnet_ip" {
-  type     = string
 }
 
 variable "project_id" {

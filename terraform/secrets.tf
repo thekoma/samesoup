@@ -30,9 +30,6 @@ resource "google_secret_manager_secret_iam_binding" "postgress_password" {
 
 ########
 
-locals {
-  postgres_user = "demoapp"
-}
 
 resource "google_secret_manager_secret" "postgres_user" {
   project = module.project-factory.project_id
@@ -61,9 +58,7 @@ resource "google_secret_manager_secret_iam_binding" "postgres_user" {
 
 ########
 
-locals {
-  postgres_db_name = "demoapp"
-}
+
 
 resource "google_secret_manager_secret" "postgres_db_name" {
   project = module.project-factory.project_id
@@ -115,6 +110,35 @@ resource "google_secret_manager_secret_version" "secret_key" {
 resource "google_secret_manager_secret_iam_binding" "secret_key" {
   project = module.project-factory.project_id
   secret_id = google_secret_manager_secret.secret_key.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  members = [
+    "serviceAccount:${google_service_account.replatform.email}",
+    "serviceAccount:${google_service_account.refactor.email}",
+    "serviceAccount:${google_service_account.rehost.email}"
+  ]
+}
+
+
+
+
+
+resource "google_secret_manager_secret" "db_host" {
+  project = module.project-factory.project_id
+  secret_id = "db-host"
+  replication {
+    automatic = true
+  }
+  depends_on  = [ module.enabled_google_apis ]
+}
+
+resource "google_secret_manager_secret_version" "db_host" {
+  secret = google_secret_manager_secret.db_host.id
+  secret_data = google_sql_database_instance.app-db.private_ip_address
+}
+
+resource "google_secret_manager_secret_iam_binding" "db_host" {
+  project = module.project-factory.project_id
+  secret_id = google_secret_manager_secret.db_host.secret_id
   role = "roles/secretmanager.secretAccessor"
   members = [
     "serviceAccount:${google_service_account.replatform.email}",

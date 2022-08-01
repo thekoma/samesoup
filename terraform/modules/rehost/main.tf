@@ -28,3 +28,8 @@ resource "google_compute_instance" "rehost" {
   metadata_startup_script = "echo hi > /test.txt"
   tags = var.tags
 }
+
+
+output "instance_ip_addr" {
+  value = google_compute_instance.rehost.network_interface.0.access_config.0.nat_ip
+}

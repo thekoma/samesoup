@@ -9,10 +9,10 @@ variable "network_name" {
   nullable = false
 }
 
-variable "subnetwork_name" {
-  type     = string
-  nullable = false
-}
+# variable "subnetwork_name" {
+#   type     = string
+#   nullable = false
+# }
 
 variable "subnetwork" {
   type     = string

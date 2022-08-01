@@ -12,6 +12,27 @@ terraform {
 data "google_project" "project" {
   project_id = var.project_id
 }
+data "google_compute_network" "main-network" {
+  name = var.network_name
+  project = var.project_id
+}
+
+resource "google_compute_subnetwork" "gke" {
+  project       = var.project_id
+  name          = "replatform"
+  ip_cidr_range = var.subnet_ip
+  region        = var.region
+  network       = data.google_compute_network.main-network.id
+  secondary_ip_range {
+    range_name    = var.ip_range_services_name
+    ip_cidr_range = var.svcs_subnet_ip
+  }
+
+  secondary_ip_range {
+    range_name    = var.ip_range_pods_name
+    ip_cidr_range = var.pods_subnet_ip
+  }
+}
 
 module "gke" {
   # version                     = "~> 22.0"
@@ -23,7 +44,7 @@ module "gke" {
   enable_shielded_nodes       = true
   remove_default_node_pool    = false
   network                     = var.network_name
-  subnetwork                  = var.subnetwork_name
+  subnetwork                  = google_compute_subnetwork.gke.name
   ip_range_pods               = var.ip_range_pods_name
   ip_range_services           = var.ip_range_services_name
   identity_namespace          = "${var.project_id}.svc.id.goog"

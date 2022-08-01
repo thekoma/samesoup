@@ -8,6 +8,18 @@ variable "org_id" {
   nullable = false
 }
 
+variable "dns_project_id" {
+  type     = string
+  nullable = false
+}
+
+
+variable "dns_zone" {
+  type     = string
+  nullable = true
+  default = "demo"
+}
+
 variable "billing_account" {
   type     = string
   nullable = false
@@ -100,4 +112,12 @@ locals {
 variable "gcp_creds" {
   type     = string
   default = "./credentials.json"
+}
+
+locals {
+  postgres_db_name = "demoapp"
+}
+
+locals {
+  postgres_user = "demoapp"
 }
