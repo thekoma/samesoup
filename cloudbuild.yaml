@@ -42,7 +42,7 @@ steps:
       EOF
       cat backend.tf
 - id: 'tf init'
-  name: 'hashicorp/terraform:latest'
+  name: 'gcr.io/seed-project-31337/github.com/thekoma/terraform-gcloud:latest'
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -54,7 +54,7 @@ steps:
       || exit 1
 # [START tf-plan]
 - id: 'tf plan'
-  name: 'hashicorp/terraform:latest'
+  name: 'gcr.io/seed-project-31337/github.com/thekoma/terraform-gcloud:latest'
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -71,7 +71,7 @@ steps:
 
 # [START tf-apply]
 - id: 'tf apply'
-  name: 'hashicorp/terraform:latest'
+  name: 'gcr.io/seed-project-31337/github.com/thekoma/terraform-gcloud:latest'
   entrypoint: 'sh'
   args: 
   - '-c'
