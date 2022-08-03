@@ -64,6 +64,7 @@ steps:
       terraform plan -no-color \
         -var='project_name=$_PROJECT_NAME' \
         -var='org_id=$_ORG_ID' \
+        -var='dns_project_id=$_DNS_PROJECT__ID' \
         -var='billing_account=$_BILLING_ACCOUNT' \
         -var='folder_id=$_FOLDER_ID' \
       || exit 1
@@ -81,6 +82,7 @@ steps:
       terraform apply -auto-approve -no-color \
           -var='project_name=$_PROJECT_NAME' \
           -var='org_id=$_ORG_ID' \
+          -var='dns_project_id=$_DNS_PROJECT__ID' \
           -var='billing_account=$_BILLING_ACCOUNT' \
           -var='folder_id=$_FOLDER_ID'
 # [END tf-apply]  
