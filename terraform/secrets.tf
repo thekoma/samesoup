@@ -146,3 +146,122 @@ resource "google_secret_manager_secret_iam_binding" "db_host" {
     "serviceAccount:${google_service_account.rehost.email}"
   ]
 }
+
+
+resource "google_secret_manager_secret" "bucket_id" {
+  project = module.project-factory.project_id
+  secret_id = "bucket-id"
+  replication {
+    automatic = true
+  }
+  depends_on  = [ module.enabled_google_apis ]
+}
+
+resource "google_secret_manager_secret_version" "bucket_id" {
+  secret = google_secret_manager_secret.bucket_id.id
+  secret_data = google_storage_bucket.utils.url
+}
+
+resource "google_secret_manager_secret_iam_binding" "bucket_id" {
+  project = module.project-factory.project_id
+  secret_id = google_secret_manager_secret.bucket_id.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  members = [
+    "serviceAccount:${google_service_account.replatform.email}",
+    "serviceAccount:${google_service_account.refactor.email}",
+    "serviceAccount:${google_service_account.rehost.email}"
+  ]
+}
+
+
+##########################################################################
+
+resource "google_secret_manager_secret" "hmac_secret_id" {
+  project = module.project-factory.project_id
+  secret_id = "hmac_secret_id"
+  replication {
+    automatic = true
+  }
+  depends_on  = [ module.enabled_google_apis ]
+}
+resource "google_secret_manager_secret_version" "hmac_secret_id" {
+  secret = google_secret_manager_secret.hmac_secret_id.id
+  secret_data = google_storage_hmac_key.hmac_secret.access_id
+}
+resource "google_secret_manager_secret_iam_binding" "hmac_secret_id" {
+  project = module.project-factory.project_id
+  secret_id = google_secret_manager_secret.hmac_secret_id.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  members = [
+    "serviceAccount:${google_service_account.replatform.email}",
+    "serviceAccount:${google_service_account.refactor.email}",
+    "serviceAccount:${google_service_account.rehost.email}"
+  ]
+}
+
+
+
+
+
+resource "google_secret_manager_secret" "hmac_secret_key" {
+  project = module.project-factory.project_id
+  secret_id = "hmac_secret_key"
+  replication {
+    automatic = true
+  }
+  depends_on  = [ module.enabled_google_apis ]
+}
+
+resource "google_secret_manager_secret_version" "hmac_secret_key" {
+  secret = google_secret_manager_secret.hmac_secret_key.id
+  secret_data = google_storage_hmac_key.hmac_secret.secret
+}
+
+resource "google_secret_manager_secret_iam_binding" "hmac_secret_key" {
+  project = module.project-factory.project_id
+  secret_id = google_secret_manager_secret.hmac_secret_key.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  members = [
+    "serviceAccount:${google_service_account.replatform.email}",
+    "serviceAccount:${google_service_account.refactor.email}",
+    "serviceAccount:${google_service_account.rehost.email}"
+  ]
+}
+
+
+
+######
+
+
+resource "random_password" "kanban_password" {
+  length           = 16
+  special          = false
+}
+
+resource "google_secret_manager_secret" "kanban_password" {
+  project = module.project-factory.project_id
+  secret_id = "kanban_password"
+  replication {
+    automatic = true
+  }
+  depends_on  = [ module.enabled_google_apis ]
+}
+
+resource "google_secret_manager_secret_version" "kanban_password" {
+  secret = google_secret_manager_secret.kanban_password.id
+  secret_data = random_password.kanban_password.result
+}
+
+resource "google_secret_manager_secret_iam_binding" "kanban_password" {
+  project = module.project-factory.project_id
+  secret_id = google_secret_manager_secret.kanban_password.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  members = [
+    "serviceAccount:${google_service_account.replatform.email}",
+    "serviceAccount:${google_service_account.refactor.email}",
+    "serviceAccount:${google_service_account.rehost.email}"
+  ]
+}
+output "kanban_password" {
+  value = nonsensitive(random_password.kanban_password.result)
+}

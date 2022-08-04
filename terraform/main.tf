@@ -21,6 +21,14 @@ module "project-factory" {
   auto_create_network = true
 }
 
+
+
+module "policies" {
+  source              = "./modules/policies"
+  project_id          = module.project-factory.project_id
+}
+
+# Single instance
 module "rehost" {
   source              = "./modules/rehost"
   project_id          = module.project-factory.project_id
@@ -29,19 +37,22 @@ module "rehost" {
   primary-zone        = var.primary-zone
   tags                = ["ssh","http","https"]
   service_account_id  = google_service_account.rehost.id
-}
-module "replatform" {
-  source                  = "./modules/replatform"
-  network_name            = var.network_name
-  primary-zone            = var.primary-zone
-  project_id              = module.project-factory.project_id
-  ip_range_pods_name      = var.ip_range_pods_name
-  ip_range_services_name  = var.ip_range_services_name
-  gke_cluster_name        = "replatform"
-  # depends_on        = [module.enabled_google_apis]
+  gcs_ansible_url     = "${google_storage_bucket.utils.url}/ansible"
+  module_depends_on       = [ module.policies, google_sql_database.app-db, google_storage_bucket.utils, google_compute_network.main-network ]
 }
 
-
+#GKE
+# module "replatform" {
+#   source                  = "./modules/replatform"
+#   network_name            = var.network_name
+#   primary-zone            = var.primary-zone
+#   project_id              = module.project-factory.project_id
+#   ip_range_pods_name      = var.ip_range_pods_name
+#   ip_range_services_name  = var.ip_range_services_name
+#   gke_cluster_name        = "replatform"
+#   # depends_on        = [module.enabled_google_apis]
+#   module_depends_on       = [ module.policies, google_sql_database.app-db, google_storage_bucket.utils, google_compute_network.main-network ]
+# }
 
 module "dns" {
   source              = "./modules/dns"
@@ -49,5 +60,4 @@ module "dns" {
   prefix_name         = var.project_name   # This will be used to create the zone prefix
   dns_zone            = var.dns_zone
   rehost_endpoint     = module.rehost.instance_ip_addr
-  # replatform_endpoint =
 }

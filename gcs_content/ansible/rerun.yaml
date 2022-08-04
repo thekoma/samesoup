@@ -1,0 +1,23 @@
+---
+- name: "Configure host"
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+  tasks:
+    - name: Ensure this playbook is updated costantly (also as first step so that we can retry)
+      tags: [ "always" ]
+      ansible.builtin.cron:
+        name: "Update confs"
+        minute: "*/5"
+        hour: "*"
+        job: "sh -c /opt/installer/rerun.sh >/dev/null"
+        user: root
+
+    - name: Update the reconfiguration script
+      tags: [ "always" ]
+      ansible.builtin.template:
+        src: rerun.sh.j2
+        dest: "/opt/installer/rerun.sh"
+        owner: '0'
+        group: '0'
+        mode: '0755'

@@ -4,20 +4,38 @@ resource "google_compute_network" "main-network" {
   project       = module.project-factory.project_id
 }
 
-resource "google_compute_global_address" "private_ip_alloc" {
+# resource "google_compute_global_address" "private_ip_alloc" {
+#   project       = module.project-factory.project_id
+#   name          = "private-ip-alloc"
+#   purpose       = "VPC_PEERING"
+#   address_type  = "INTERNAL"
+#   prefix_length = 16
+#   network       = google_compute_network.main-network.id
+# }
+
+resource "google_compute_global_address" "private_ip_address" {
+  provider = google-beta
   project       = module.project-factory.project_id
-  name          = "private-ip-alloc"
+  name          = "private-ip-address"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
   network       = google_compute_network.main-network.id
 }
 
-resource "google_service_networking_connection" "service_net" {
+# resource "google_service_networking_connection" "service_net" {
+#   network                 = google_compute_network.main-network.id
+#   service                 = "servicenetworking.googleapis.com"
+#   reserved_peering_ranges = [google_compute_global_address.private_ip_alloc.name]
+# }
+
+resource "google_service_networking_connection" "private_vpc_connection" {
+  provider = google-beta
   network                 = google_compute_network.main-network.id
   service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_ip_alloc.name]
+  reserved_peering_ranges = [ google_compute_global_address.private_ip_address.name ]
 }
+
 
 data "google_compute_subnetwork" "sub_nat_net" {
   name        = var.subnetwork
@@ -47,22 +65,3 @@ resource "google_compute_router_nat" "nat" {
     filter = "ERRORS_ONLY"
   }
 }
-
-resource "google_compute_global_address" "private_ip_address" {
-  provider = google-beta
-  project       = module.project-factory.project_id
-  name          = "private-ip-address"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.main-network.id
-}
-
-resource "google_service_networking_connection" "private_vpc_connection" {
-  provider = google-beta
-  network                 = google_compute_network.main-network.id
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [ google_compute_global_address.private_ip_address.name ]
-}
-
-

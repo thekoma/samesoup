@@ -7,8 +7,8 @@ locals {
   basename = "${var.prefix_name}.${data.google_dns_managed_zone.soup.dns_name}"
 }
 
-resource "google_dns_record_set" "rehost-api" {
-  name          = "api.rehost.${local.basename}"
+resource "google_dns_record_set" "rehost" {
+  name          = "rehost.${local.basename}"
   project       = var.project_id
   managed_zone  = data.google_dns_managed_zone.soup.name
   type          = "A"
@@ -16,8 +16,8 @@ resource "google_dns_record_set" "rehost-api" {
   rrdatas       = [ var.rehost_endpoint ]
 }
 
-resource "google_dns_record_set" "rehost-www" {
-  name          = "www.rehost.${local.basename}"
+resource "google_dns_record_set" "rehost-mig" {
+  name          = "rehost-mig.${local.basename}"
   project       = var.project_id
   managed_zone  = data.google_dns_managed_zone.soup.name
   type          = "A"

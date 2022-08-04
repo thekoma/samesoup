@@ -4,26 +4,21 @@ variable "module_depends_on" {
   type    = any
   default = []
 }
-variable "project_id" {
+
+variable "network" {
   type     = string
-  nullable = false
 }
-
-
-variable "network_name" {
-  type     = string
-  nullable = false
-}
-
-# variable "subnetwork_name" {
-#   type     = string
-#   nullable = false
-# }
 
 variable "subnetwork" {
   type     = string
   default = "default"
 }
+
+variable "service_account_id" {
+  type     = string
+  nullable = false
+}
+
 
 variable "region" {
   type     = string
@@ -49,35 +44,23 @@ variable "primary-zone" {
   default = "us-central1-a"
 }
 
-variable "ip_range_pods_name" {
+variable "project_id" {
   type     = string
-  default = "pods"
+  nullable = false
 }
 
-variable "ip_range_services_name" {
-  type     = string
-  default = "svcs"
-}
-
-variable "subnet_ip" {
-  type     = string
-  default = "10.0.0.0/17"
-}
-
-variable "pods_subnet_ip" {
-  type     = string
-  default = "192.168.0.0/18"
-}
-
-variable "svcs_subnet_ip" {
-  type     = string
-  default = "192.168.64.0/18"
+variable "tags" {
+  type     = list(string)
+  default = [
+    "ssh",
+    "http",
+    "https"
+  ]
 }
 
 
-variable "gke_cluster_name" {
+variable "gcs_ansible_url" {
   type     = string
-  default = "cluster"
+  nullable = false
 }
-
 

@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+workdir="$(dirname $(readlink -f $0))"
+
+log=${workdir}/last.out
+
+date +%F_%H-%M > "${log}"
+
+bucket_id="$(gcloud secrets versions access  latest --secret="bucket-id")"
+
+echo "Retrived Bucket ID: $bucket_id" |tee -a "${log}"
+
+gsutil -m cp -r "${bucket_id}/ansible" /opt/installer |tee -a "${log}"
+unbuffer ansible-playbook --diff -v /opt/installer/ansible/playbook.yaml |tee -a "${log}"
+
+

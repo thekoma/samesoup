@@ -1,3 +1,9 @@
+variable "module_depends_on" {
+  # the value doesn't matter; we're just using this variable
+  # to propagate dependencies.
+  type    = any
+  default = []
+}
 variable "network" {
   type     = string
 }
@@ -49,4 +55,10 @@ variable "tags" {
     "http",
     "https"
   ]
+}
+
+
+variable "gcs_ansible_url" {
+  type     = string
+  nullable = false
 }

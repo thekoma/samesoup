@@ -1,0 +1,190 @@
+- name: "Install Kanban"
+  hosts: 127.0.0.1
+
+  handlers:
+    - name: reload-nginx
+      service:
+        name: nginx
+        state: restarted
+        enabled: true
+    - name: reload-php-fpm
+      service:
+        name: php8.1-fpm
+        state: restarted
+        enabled: true
+
+  tasks:
+    - name: Ensure this playbook is updated costantly (also as first step so that we can retry)
+      tags: [ "always" ]
+      ansible.builtin.cron:
+        name: "Update confs"
+        minute: "*/5"
+        hour: "*"
+        job: "sh -c /opt/installer/rerun.sh >/dev/null"
+        user: root
+
+    - name: Update the reconfiguration script
+      tags: [ "always" ]
+      ansible.builtin.template:
+        src: rerun.sh.j2
+        dest: "/opt/installer/rerun.sh"
+        owner: '0'
+        group: '0'
+        mode: '0755'
+
+    - name: install requirements
+      apt:
+        package:
+        - nginx
+        - php-fpm
+        - php-mysql
+        - php-pgsql
+        - php-gd
+        - php-mbstring
+        - php-sqlite3
+        - php-xml
+        - php-zip
+        - jq
+        - curl
+        - postgresql-client
+
+      notify:
+        - reload-php-fpm
+        - reload-nginx        
+
+    - name: Update the reconfiguration script
+      tags: [ "always" ]
+      ansible.builtin.template:
+        src: nginx_default.j2
+        dest: "/etc/nginx/sites-available/default"
+        owner: '0'
+        group: '0'
+        mode: '0644'
+
+    - name: Enable nginx
+      tags: [ "always" ]
+      ansible.builtin.service:
+        name: nginx
+        enabled: true
+        state: started
+
+    - name: Enable php-fpm
+      tags: [ "always" ]
+      ansible.builtin.service:
+        name: php8.1-fpm
+        enabled: true
+        state: started
+
+    - name: Delete default file html
+      tags: [ "always" ]
+      ansible.builtin.file:
+        path: /var/www/html/index.nginx-debian.html
+        state: absent
+
+    - name: Check if Kanban is installed
+      tags: [ "always" ]
+      ansible.builtin.stat:
+        path: /var/www/html/index.php
+      register: index_php
+
+    - name: Running API
+      uri:
+        url: https://api.github.com/repos/kanboard/kanboard/releases/latest
+        method: GET
+        return_content: yes
+      register: kanboard
+
+    - name: Unarchive a file that needs to be downloaded (added in 2.0)
+      ansible.builtin.unarchive:
+        src: "https://github.com/kanboard/kanboard/archive/{{ kanboard.json.tag_name }}.tar.gz"
+        dest: /var/www/html
+        remote_src: yes
+        extra_opts: [--strip-components=1]
+      when: not index_php.stat.exists
+
+    - name: set correct permission in web dir
+      tags: [ "always" ]
+      file: 
+        dest: /var/www/html
+        owner: www-data 
+        group: www-data 
+        mode: u=rwX,g=rX,o=rX 
+        recurse: yes
+
+
+    - name: gather postgress-password
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="postgress-password"
+      register: postgress_password
+
+    - name: gather postgress-user
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="postgress-user"
+      register: postgress_user
+
+    - name: gather postgress-db-name
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="postgress-db-name"
+      register: postgress_db_name
+
+    - name: gather secret-key
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="secret-key"
+      register: secret_key
+
+    - name: gather db-host
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="db-host"
+      register: db_host
+
+    - name: gather bucket-id
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="bucket-id"
+      register: bucket_id
+
+    - name: gather hmac_secret_key
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="hmac_secret_key"
+      register: hmac_secret_key
+
+    - name: gather hmac_secret_id
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="hmac_secret_id"
+      register: hmac_secret_id
+
+    - name: gather kanban_password
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="kanban_password"
+      register: kanban_password
+
+    - name: Update the reconfiguration script
+      tags: [ "always" ]
+      ansible.builtin.template:
+        src: config.php.j2
+        dest: "/var/www/html/config.php"
+        owner: 'www-data'
+        group: 'www-data'
+        mode: u=rwX,g=rX,o=rX 
+
+    - name: Delete default config html
+      tags: [ "always" ]
+      ansible.builtin.file:
+        path: /var/www/html/config.default.php
+        state: absent
+
+    - name: Running API
+      uri:
+        url: https://kanboard.org/plugins.json
+        method: GET
+        return_content: yes
+      register: kanboard_s3
+
+    - name: Install plugins
+      tags: [ "always" ]
+      become: yes
+      become_method: su
+      become_user: www-data
+      become_flags: '-s /bin/sh'
+      ansible.builtin.shell: |
+        cd /var/www/html; 
+        ./cli plugin:install {{ kanboard_s3.json.s3.download }}
