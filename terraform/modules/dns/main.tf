@@ -24,3 +24,6 @@ resource "google_dns_record_set" "rehost-mig" {
   ttl           = 300
   rrdatas       = [ var.rehost_endpoint ]
 }
+
+
+

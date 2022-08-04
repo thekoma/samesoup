@@ -262,6 +262,50 @@ resource "google_secret_manager_secret_iam_binding" "kanban_password" {
     "serviceAccount:${google_service_account.rehost.email}"
   ]
 }
+
+
+
+#######REHOST####
+
+data "google_dns_managed_zone" "soup" {
+  name    = var.dns_zone
+  project = var.dns_project_id
+}
+
+locals {
+  dns_basename = "${var.project_name}.${data.google_dns_managed_zone.soup.dns_name}"
+}
+
+resource "google_secret_manager_secret" "rehost_record" {
+  project = module.project-factory.project_id
+  secret_id = "rehost_record"
+  replication {
+    automatic = true
+  }
+  depends_on  = [ module.enabled_google_apis ]
+}
+resource "google_secret_manager_secret_version" "rehost_record" {
+  secret = google_secret_manager_secret.rehost_record.id
+  secret_data = "rehost.${local.dns_basename}"
+}
+resource "google_secret_manager_secret_iam_binding" "rehost_record" {
+  project = module.project-factory.project_id
+  secret_id = google_secret_manager_secret.rehost_record.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  members = [
+    "serviceAccount:${google_service_account.replatform.email}",
+    "serviceAccount:${google_service_account.refactor.email}",
+    "serviceAccount:${google_service_account.rehost.email}"
+  ]
+}
+
+
+
+
+######
+
+
+
 output "kanban_password" {
   value = nonsensitive(random_password.kanban_password.result)
 }

@@ -52,6 +52,21 @@
       tags: [ "always" ]
       shell: curl -s ipinfo.io |jq -r .ip
       register: myip
+    - name: "Values decripted"
+      vars:
+        resolved_ip: "{{ lookup( 'community.general.dig', rehost_record.stdout ) }}"
+      debug:
+        msg: "Public url is {{rehost_record.stdout}}, that resolve at IP {{ resolved_ip }} and my ip is {{myip.stdout}}"
+    - name: "I'm a standalone server"
+      when:
+        - lookup('community.general.dig', rehost_record.stdout ) == myip.stdout
+      debug:
+        msg: "I'm going to be a standalone server at {{rehost_record.stdout}}"
+    - name: "I'm a pool server"
+      when:
+        - not lookup('community.general.dig', rehost_record.stdout ) == myip.stdout
+      debug:
+        msg: "I'm going to be a pool server at {{rehost_record.stdout}}"
   tasks:
 
 
@@ -195,7 +210,8 @@
         ./cli plugin:install {{ kanboard_s3.json.s3.download }}
 
   roles:
-    - role: maxhoesel.caddy.caddy_server
+    - name: Configuring Caddy for ssl reverse
+      role: maxhoesel.caddy.caddy_server
       become: true
       when:
         - lookup('community.general.dig', rehost_record.stdout ) == myip.stdout
@@ -203,10 +219,11 @@
         caddy_caddyfile: |
           rehost.soup.thekoma.demo.altostrat.com
           reverse_proxy http://127.0.0.1:8080
-    - role: maxhoesel.caddy.caddy_server
+    - name: Configuring Caddy for plain catchall
+      role: maxhoesel.caddy.caddy_server
       become: true
       when:
-        - lookup('community.general.dig', rehost_record.stdout ) == myip.stdout
+        - not lookup('community.general.dig', rehost_record.stdout ) == myip.stdout
       vars:
         caddy_caddyfile: |
           reverse_proxy http://127.0.0.1:8080
