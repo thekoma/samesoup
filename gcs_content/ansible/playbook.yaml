@@ -60,6 +60,9 @@
         owner: '0'
         group: '0'
         mode: '0644'
+      notify:
+        - reload-php-fpm
+        - reload-nginx
 
     - name: Enable nginx
       tags: [ "always" ]
@@ -110,7 +113,6 @@
         group: www-data 
         mode: u=rwX,g=rX,o=rX 
         recurse: yes
-
 
     - name: gather postgress-password
       tags: [ "always" ]
@@ -188,3 +190,12 @@
       ansible.builtin.shell: |
         cd /var/www/html; 
         ./cli plugin:install {{ kanboard_s3.json.s3.download }}
+
+
+  roles:
+    - role: maxhoesel.caddy.caddy_server
+      become: yes
+      # vars:
+      #   caddy_caddyfile: |
+      #       localhost:80
+      #       respond "Hello, world!"

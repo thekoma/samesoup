@@ -2,15 +2,20 @@
 set -e
 workdir="$(dirname $(readlink -f $0))"
 
-log=${workdir}/last.out
-
-date +%F_%H-%M > "${log}"
+logdir=${workdir}/logs
+if [[ ! -f "${logdir}" ]]; then mkdir -p "${logdir}"; fi
+lastlog="${logdir}/last.out"
+fulllog="${logdir}/all.out"
+touch "${fulllog}"
+tail --bytes=$(expr $(wc -c < ${fulllog}) - 104857600) ${fulllog} > ${fulllog}.tmp
+mv ${fulllog}.tmp ${fulllog}
+date +%F_%H-%M |tee -a "${lastlog}" "${fulllog}"
 
 bucket_id="$(gcloud secrets versions access  latest --secret="bucket-id")"
 
-echo "Retrived Bucket ID: $bucket_id" |tee -a "${log}"
+echo "Retrived Bucket ID: ${bucket_id}" |tee -a "${lastlog}" "${fulllog}"
 
-gsutil -m cp -r "${bucket_id}/ansible" /opt/installer |tee -a "${log}"
-unbuffer ansible-playbook --diff -v /opt/installer/ansible/playbook.yaml |tee -a "${log}"
+gsutil -m cp -r "${bucket_id}/ansible" /opt/installer |tee -a "${lastlog}" "${fulllog}"
+unbuffer ansible-playbook --diff -v /opt/installer/ansible/playbook.yaml |tee -a "${lastlog}" "${fulllog}"
 
-
+#EOF
