@@ -12,8 +12,7 @@
         name: php8.1-fpm
         state: restarted
         enabled: true
-
-  tasks:
+  pre_tasks:
     - name: Ensure this playbook is updated costantly (also as first step so that we can retry)
       tags: [ "always" ]
       ansible.builtin.cron:
@@ -22,7 +21,6 @@
         hour: "*"
         job: "sh -c /opt/installer/rerun.sh >/dev/null"
         user: root
-
     - name: Update the reconfiguration script
       tags: [ "always" ]
       ansible.builtin.template:
@@ -31,7 +29,6 @@
         owner: '0'
         group: '0'
         mode: '0755'
-
     - name: install requirements
       apt:
         package:
@@ -47,10 +44,16 @@
         - jq
         - curl
         - postgresql-client
+    - name: gather rehost_record
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="rehost_record"
+      register: rehost_record
+    - name: gather myip
+      tags: [ "always" ]
+      shell: curl -s ipinfo.io |jq -r .ip
+      register: myip
+  tasks:
 
-      notify:
-        - reload-php-fpm
-        - reload-nginx        
 
     - name: Update the reconfiguration script
       tags: [ "always" ]
@@ -191,11 +194,20 @@
         cd /var/www/html; 
         ./cli plugin:install {{ kanboard_s3.json.s3.download }}
 
-
   roles:
     - role: maxhoesel.caddy.caddy_server
-      become: yes
-      # vars:
-      #   caddy_caddyfile: |
-      #       localhost:80
-      #       respond "Hello, world!"
+      become: true
+      when:
+        - lookup('community.general.dig', rehost_record.stdout ) == myip.stdout
+      vars:
+        caddy_caddyfile: |
+          rehost.soup.thekoma.demo.altostrat.com
+          reverse_proxy http://127.0.0.1:8080
+    - role: maxhoesel.caddy.caddy_server
+      become: true
+      when:
+        - lookup('community.general.dig', rehost_record.stdout ) == myip.stdout
+      vars:
+        caddy_caddyfile: |
+          reverse_proxy http://127.0.0.1:8080
+          auto_https off
