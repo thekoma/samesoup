@@ -24,7 +24,8 @@ resource "google_secret_manager_secret_iam_binding" "postgress_password" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -52,7 +53,8 @@ resource "google_secret_manager_secret_iam_binding" "postgres_user" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -81,7 +83,8 @@ resource "google_secret_manager_secret_iam_binding" "postgres_db_name" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -114,7 +117,8 @@ resource "google_secret_manager_secret_iam_binding" "secret_key" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -143,7 +147,8 @@ resource "google_secret_manager_secret_iam_binding" "db_host" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -169,7 +174,8 @@ resource "google_secret_manager_secret_iam_binding" "bucket_id" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -195,7 +201,8 @@ resource "google_secret_manager_secret_iam_binding" "hmac_secret_id" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -224,7 +231,8 @@ resource "google_secret_manager_secret_iam_binding" "hmac_secret_key" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -259,7 +267,8 @@ resource "google_secret_manager_secret_iam_binding" "kanban_password" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -295,7 +304,8 @@ resource "google_secret_manager_secret_iam_binding" "rehost_record" {
   members = [
     "serviceAccount:${google_service_account.replatform.email}",
     "serviceAccount:${google_service_account.refactor.email}",
-    "serviceAccount:${google_service_account.rehost.email}"
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
   ]
 }
 
@@ -308,4 +318,10 @@ resource "google_secret_manager_secret_iam_binding" "rehost_record" {
 
 output "kanban_password" {
   value = nonsensitive(random_password.kanban_password.result)
+}
+output "rehost_url" {
+  value = "https://rehost.${local.dns_basename}"
+}
+output "rehost_mig__url" {
+  value = "https://rehost-mig.${local.dns_basename}"
 }

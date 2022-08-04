@@ -15,14 +15,26 @@ resource "google_storage_bucket_object" "gcs_content" {
 }
 
 
-resource "google_project_iam_member" "rehost-object-admin" {
-  project = module.project-factory.project_id
-  role    = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.rehost.email}"
-}
+# resource "google_project_iam_member" "rehost-object-admin" {
+#   project = module.project-factory.project_id
+#   role    = "roles/storage.objectAdmin"
+#   member = "serviceAccount:${google_service_account.rehost.email}"
+# }
 
 resource "google_storage_hmac_key" "hmac_secret" {
   project = module.project-factory.project_id
   service_account_email = google_service_account.rehost.email
   depends_on = [ module.policies ]
+}
+
+
+resource "google_project_iam_binding" "gcs-admin" {
+  project = module.project-factory.project_idd
+  role    = "roles/storage.objectAdmin"
+  members = [
+    "serviceAccount:${google_service_account.replatform.email}",
+    "serviceAccount:${google_service_account.refactor.email}",
+    "serviceAccount:${google_service_account.rehost.email}",
+    "serviceAccount:${google_service_account.rehost-mig.email}"
+  ]
 }

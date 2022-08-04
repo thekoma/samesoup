@@ -4,7 +4,6 @@ variable "module_depends_on" {
   type    = any
   default = []
 }
-
 variable "network" {
   type     = string
 }
@@ -63,4 +62,3 @@ variable "gcs_ansible_url" {
   type     = string
   nullable = false
 }
-
