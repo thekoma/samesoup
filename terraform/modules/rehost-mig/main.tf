@@ -42,6 +42,7 @@ module "rehost-mig-template" {
         - mkdir -p /opt/installer/logs
         - gsutil cp -r ${var.gcs_ansible_url} /opt/installer
         - ansible-galaxy collection install community.postgresql maxhoesel.caddy community.general
+        - ansible-galaxy install googlecloudplatform.google_cloud_ops_agents
         - ansible-playbook /opt/installer/ansible/rerun.yaml
         - sh -c /opt/installer/rerun.sh
       EOT
@@ -58,6 +59,12 @@ module "rehost-mig" {
   project_id          = var.project_id
   hostname            = "rehost-mig"
   health_check_name = "rehost-mig-http"
+  named_ports = [
+    {
+    name = "http"
+    port = 8080
+    }
+  ]
   health_check = {
     type                = "http"
     initial_delay_sec   = 240
@@ -67,7 +74,7 @@ module "rehost-mig" {
     unhealthy_threshold = 10
     response            = ""
     proxy_header        = "NONE"
-    port                = 80
+    port                = 8080
     request             = ""
     request_path        = "/LICENSE"
     host                = ""
@@ -76,20 +83,21 @@ module "rehost-mig" {
 
 
 
-module "mig-lb-http" {
-  source            = "GoogleCloudPlatform/lb-http/google"
-  version           = "~> 6.3"
-  name              = "mig-http-lb"
-  project           = var.project_id
-  target_tags       = [ data.google_compute_network.main-network.name  ]
-  firewall_networks = [ data.google_compute_network.main-network.name ]
-
+module "mig-lb-https" {
+  source                          = "GoogleCloudPlatform/lb-http/google"
+  version                         = "~> 6.3"
+  name                            = "mig-lb-https"
+  project                         = var.project_id
+  target_tags                     = [ data.google_compute_network.main-network.name  ]
+  firewall_networks               = [ data.google_compute_network.main-network.name ]
+  ssl                             = true
+  use_ssl_certificates            = false
   managed_ssl_certificate_domains = var.lb_ssl_domains
   backends = {
     default = {
       description                     = null
       protocol                        = "HTTP"
-      port                            = 80
+      port                            = 8080
       port_name                       = "http"
       timeout_sec                     = 10
       connection_draining_timeout_sec = null
@@ -101,14 +109,14 @@ module "mig-lb-http" {
       custom_response_headers         = null
 
       health_check = {
-        check_interval_sec  = null
-        timeout_sec         = null
-        healthy_threshold   = null
-        unhealthy_threshold = null
-        request_path        = "/"
-        port                = 80
+        check_interval_sec  = 30
+        timeout_sec         = 30
+        healthy_threshold   = 1
+        unhealthy_threshold = 10
+        request_path        = "/LICENSE"
+        port                = 8080
         host                = null
-        logging             = null
+        logging             = true
       }
 
       log_config = {
@@ -141,7 +149,6 @@ module "mig-lb-http" {
   }
 }
 
-
 output "external_ip" {
-  value = module.mig-lb-http.external_ip
+  value = module.mig-lb-https.external_ip
 }

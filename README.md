@@ -39,3 +39,8 @@ To Run the Terraform manually, run the following command (substitute the value b
     -var='billing_account=01234A-0995B9-1FACB1' \
     -var='folder_id=1234567898765'
 ```
+
+
+## TODO:
+- Certificate with ACME (Google Certificate is too slow to propagate on demo )
+- GKE to Anthos

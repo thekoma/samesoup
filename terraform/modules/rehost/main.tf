@@ -41,6 +41,7 @@ resource "google_compute_instance" "rehost" {
         - mkdir -p /opt/installer/logs
         - gsutil cp -r ${var.gcs_ansible_url} /opt/installer
         - ansible-galaxy collection install community.postgresql maxhoesel.caddy community.general
+        - ansible-galaxy install googlecloudplatform.google_cloud_ops_agents
         - ansible-playbook /opt/installer/ansible/rerun.yaml
         - sh -c /opt/installer/rerun.sh
       EOT

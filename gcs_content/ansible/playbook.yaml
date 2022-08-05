@@ -12,6 +12,22 @@
         name: php8.1-fpm
         state: restarted
         enabled: true
+    - name: restart-logging
+      service:
+        name: google-cloud-ops-agent-fluent-bit
+        state: restarted
+        enabled: true
+    - name: restart-monitoring
+      service:
+        name: google-cloud-ops-agent-opentelemetry-collector
+        state: restarted
+        enabled: true
+    - name: restart-ops
+      service:
+        name: google-cloud-ops-agent
+        state: restarted
+        enabled: true
+
   pre_tasks:
     - name: Ensure this playbook is updated costantly (also as first step so that we can retry)
       tags: [ "always" ]
@@ -95,9 +111,47 @@
         - not lookup('community.general.dig', rehost_record.stdout ) == myip.stdout
       debug:
         msg: "I'm going to be a pool server at {{rehost_record.stdout}}"
+
   tasks:
-
-
+    - name: Adding  Logs
+      ansible.builtin.copy:
+        content: |
+          logging:
+            receivers:
+              syslog:
+                type: files
+                include_paths:
+                - /var/log/messages
+                - /var/log/syslog
+                - /var/log/caddy/*.log
+                - /var/log/nginx/*.log
+                - /var/log/php*-fpm.log
+                - /var/log/cloud-init.log
+                - /var/log/cloud-init-output.log
+                - /opt/installer/logs/all.out
+            service:
+              pipelines:
+                default_pipeline:
+                  receivers: [syslog]
+          metrics:
+            receivers:
+              hostmetrics:
+                type: hostmetrics
+                collection_interval: 60s
+            processors:
+              metrics_filter:
+                type: exclude_metrics
+                metrics_pattern: []
+            service:
+              pipelines:
+                default_pipeline:
+                  receivers: [hostmetrics]
+                  processors: [metrics_filter]
+        dest: /etc/google-cloud-ops-agent/config.yaml
+      notify:
+        - restart-logging
+        - restart-monitoring
+        - restart-ops
     - name: Enable nginx
       tags: [ "always" ]
       ansible.builtin.service:
@@ -226,6 +280,10 @@
         ./cli plugin:install {{ kanboard_s3.json.s3.download }}
 
   roles:
+    - name: Install google logging
+      role: googlecloudplatform.google_cloud_ops_agents
+      vars:
+        agent_type: ops-agent
     - name: Configuring Caddy for ssl reverse
       role: maxhoesel.caddy.caddy_server
       become: true
@@ -234,8 +292,11 @@
       vars:
         caddy_config_mode: "Caddyfile"
         caddy_caddyfile: |
-          rehost.soup.thekoma.demo.altostrat.com
-          reverse_proxy http://127.0.0.1:8080
+            rehost.soup.thekoma.demo.altostrat.com
+            reverse_proxy http://127.0.0.1:8080
+            log {
+              output file /var/log/caddy/access.log
+            }
 
     - name: Configuring Caddy for plain catchall
       role: maxhoesel.caddy.caddy_server
@@ -245,5 +306,8 @@
       vars:
         caddy_config_mode: "Caddyfile"
         caddy_caddyfile: |
-          *:80
-          reverse_proxy http://127.0.0.1:8080
+            *:80
+            reverse_proxy http://127.0.0.1:8080
+            log {
+              output file /var/log/caddy/access.log
+            }
