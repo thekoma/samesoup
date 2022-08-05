@@ -26,6 +26,12 @@ variable "rehost_endpoint" {
   default = "8.8.8.8"
 }
 
+variable "rehost_mig_endpoint" {
+  type     = string
+  nullable = true
+  default = "8.8.8.8"
+}
+
 variable "replatform_endpoint" {
   type     = string
   nullable = true

@@ -29,7 +29,7 @@ resource "google_storage_hmac_key" "hmac_secret" {
 
 
 resource "google_project_iam_binding" "gcs-admin" {
-  project = module.project-factory.project_idd
+  project = module.project-factory.project_id
   role    = "roles/storage.objectAdmin"
   members = [
     "serviceAccount:${google_service_account.replatform.email}",

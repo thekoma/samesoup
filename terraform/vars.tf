@@ -121,3 +121,12 @@ locals {
 locals {
   postgres_user = "demoapp"
 }
+
+
+locals {
+  dns_basename = "${var.project_name}.${data.google_dns_managed_zone.soup.dns_name}"
+}
+
+locals {
+  rehost_mig_domain = "rehost-mig.${local.dns_basename}"
+}

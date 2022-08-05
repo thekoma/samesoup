@@ -281,9 +281,7 @@ data "google_dns_managed_zone" "soup" {
   project = var.dns_project_id
 }
 
-locals {
-  dns_basename = "${var.project_name}.${data.google_dns_managed_zone.soup.dns_name}"
-}
+
 
 resource "google_secret_manager_secret" "rehost_record" {
   project = module.project-factory.project_id
@@ -322,6 +320,10 @@ output "kanban_password" {
 output "rehost_url" {
   value = "https://rehost.${local.dns_basename}"
 }
-output "rehost_mig__url" {
+output "rehost_mig_url" {
   value = "https://rehost-mig.${local.dns_basename}"
+}
+
+output "rehost_mig_domain" {
+  value = local.rehost_mig_domain
 }

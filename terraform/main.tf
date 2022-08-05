@@ -44,14 +44,15 @@ module "rehost" {
 module "rehost-mig" {
   source              = "./modules/rehost-mig"
   project_id          = module.project-factory.project_id
-  network             = google_compute_network.main-network.id
+  network             = google_compute_network.main-network.name
   subnetwork          = data.google_compute_subnetwork.sub_nat_net.id
   region              = var.region
   primary-zone        = var.primary-zone
   tags                = ["ssh","http","https"]
   service_account_id  = google_service_account.rehost-mig.id
   gcs_ansible_url     = "${google_storage_bucket.utils.url}/ansible"
-  module_depends_on       = [ module.policies, google_sql_database.app-db, google_storage_bucket.utils, google_compute_network.main-network ]
+  module_depends_on   = [ module.policies, google_sql_database.app-db, google_storage_bucket.utils, google_compute_network.main-network ]
+  lb_ssl_domains       = [ local.rehost_mig_domain ]
 }
 
 
@@ -74,4 +75,5 @@ module "dns" {
   prefix_name         = var.project_name   # This will be used to create the zone prefix
   dns_zone            = var.dns_zone
   rehost_endpoint     = module.rehost.instance_ip_addr
+  rehost_mig_endpoint = module.rehost-mig.external_ip
 }

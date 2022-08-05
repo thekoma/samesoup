@@ -22,5 +22,5 @@ resource "google_dns_record_set" "rehost-mig" {
   managed_zone  = data.google_dns_managed_zone.soup.name
   type          = "A"
   ttl           = 300
-  rrdatas       = [ var.rehost_endpoint ]
+  rrdatas       = [ var.rehost_mig_endpoint ]
 }

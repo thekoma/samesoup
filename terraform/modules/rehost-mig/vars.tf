@@ -62,3 +62,9 @@ variable "gcs_ansible_url" {
   type     = string
   nullable = false
 }
+
+
+variable "lb_ssl_domains" {
+  type     = list(string)
+  nullable = false
+}

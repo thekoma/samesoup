@@ -16,11 +16,20 @@
     - name: Ensure this playbook is updated costantly (also as first step so that we can retry)
       tags: [ "always" ]
       ansible.builtin.cron:
-        name: "Update confs"
+        name: "Update confs every 5 minutes"
         minute: "*/5"
         hour: "*"
         job: "sh -c /opt/installer/rerun.sh >/dev/null"
         user: root
+
+    - name: Ensure this playbook is updated costantly (also as first step so that we can retry)
+      tags: [ "always" ]
+      ansible.builtin.cron:
+        name: "Update confs at reboot"
+        special_time: reboot
+        job: "sh -c /opt/installer/rerun.sh >/dev/null"
+        user: root
+
     - name: Update the reconfiguration script
       tags: [ "always" ]
       ansible.builtin.template:
@@ -29,23 +38,11 @@
         owner: '0'
         group: '0'
         mode: '0755'
-    - name: Update the reconfiguration script
-      tags: [ "always" ]
-      ansible.builtin.template:
-        src: nginx_default.j2
-        dest: "/etc/nginx/sites-available/default"
-        owner: '0'
-        group: '0'
-        mode: '0644'
+
       notify:
         - reload-php-fpm
         - reload-nginx
-    - name: Enable nginx
-      tags: [ "always" ]
-      ansible.builtin.service:
-        name: nginx
-        enabled: true
-        state: restarted
+
     - name: install requirements
       apt:
         package:
@@ -61,6 +58,20 @@
         - jq
         - curl
         - postgresql-client
+    - name: Update the reconfiguration script
+      tags: [ "always" ]
+      ansible.builtin.template:
+        src: nginx_default.j2
+        dest: "/etc/nginx/sites-available/default"
+        owner: '0'
+        group: '0'
+        mode: '0644'
+    - name: Enable nginx
+      tags: [ "always" ]
+      ansible.builtin.service:
+        name: nginx
+        enabled: true
+        state: restarted
     - name: gather rehost_record
       tags: [ "always" ]
       shell: gcloud secrets versions access  latest --secret="rehost_record"
@@ -234,5 +245,5 @@
       vars:
         caddy_config_mode: "Caddyfile"
         caddy_caddyfile: |
-          *
+          *:80
           reverse_proxy http://127.0.0.1:8080
