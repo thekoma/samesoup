@@ -77,7 +77,7 @@ variable "svcs_subnet_ip" {
 
 variable "gke_cluster_name" {
   type     = string
-  default = "cluster"
+  default = "soup"
 }
 
 

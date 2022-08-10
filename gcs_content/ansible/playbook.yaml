@@ -133,6 +133,9 @@
               pipelines:
                 default_pipeline:
                   receivers: [syslog]
+            processors:
+              digest_json:
+                type: parse_json
           metrics:
             receivers:
               hostmetrics:

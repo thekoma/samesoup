@@ -55,7 +55,8 @@ module "rehost-mig" {
   instance_template   = module.rehost-mig-template.self_link
   region              = var.region
   autoscaling_enabled = true
-  target_size         = 3
+  min_replicas        = 1
+  max_replicas        = 2
   project_id          = var.project_id
   hostname            = "rehost-mig"
   health_check_name = "rehost-mig-http"

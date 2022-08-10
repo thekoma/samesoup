@@ -48,7 +48,37 @@ module "gke" {
   ip_range_pods               = var.ip_range_pods_name
   ip_range_services           = var.ip_range_services_name
   identity_namespace          = "${var.project_id}.svc.id.goog"
+  cluster_resource_labels = { "mesh_id" : "proj-${data.google_project.project.number}" }
 }
+
+resource "google_gke_hub_membership" "soup" {
+  membership_id = "soup-membership"
+  project       = var.project_id
+  endpoint {
+    gke_cluster {
+      resource_link = "//container.googleapis.com/${module.gke.cluster_id}"
+    }
+  }
+  provider = google-beta
+}
+resource "google_gke_hub_feature" "feature" {
+  project = var.project_id
+  name = "configmanagement"
+  location = "global"
+  provider = google-beta
+}
+
+# module "asm-primary" {
+#   source                = "terraform-google-modules/kubernetes-engine/google//modules/asm"
+#   # version               = "18.0.0"
+#   project_id            = var.project_id
+#   cluster_name          = module.gke.name
+#   location              = module.gke.location
+#   cluster_endpoint      = module.gke.endpoint
+#   enable_all            = true
+#   outdir                = "./asm-dir-${module.gke.name}"
+# }
+
 
 resource "google_service_account" "metrics" {
   project       = var.project_id
@@ -71,29 +101,29 @@ provider "kubectl" {
 
 data "google_client_config" "default" {}
 
-resource "kubernetes_namespace" "custom-metrics" {
-  metadata {
-    name = "custom-metrics"
-  }
-}
+# resource "kubernetes_namespace" "custom-metrics" {
+#   metadata {
+#     name = "custom-metrics"
+#   }
+# }
 
-resource "kubernetes_service_account" "custom-metrics-stackdriver-adapter" {
-  depends_on = [ kubernetes_namespace.custom-metrics ]
-  metadata {
-    name        = "custom-metrics-stackdriver-adapter"
-    namespace   = "custom-metrics"
-    annotations = {
-      "iam.gke.io/gcp-service-account" = "metrics-driver@${var.project_id}.iam.gserviceaccount.com"
-    }
-  }
-}
+# resource "kubernetes_service_account" "custom-metrics-stackdriver-adapter" {
+#   depends_on = [ kubernetes_namespace.custom-metrics ]
+#   metadata {
+#     name        = "custom-metrics-stackdriver-adapter"
+#     namespace   = "custom-metrics"
+#     annotations = {
+#       "iam.gke.io/gcp-service-account" = "metrics-driver@${var.project_id}.iam.gserviceaccount.com"
+#     }
+#   }
+# }
 
-data "kubectl_filename_list" "custom-metrics-stackdriver-adapter-manifests" {
-  pattern = "${path.module}/manifests/custom-metrics/*.yaml"
-}
+# data "kubectl_filename_list" "custom-metrics-stackdriver-adapter-manifests" {
+#   pattern = "${path.module}/manifests/custom-metrics/*.yaml"
+# }
 
-resource "kubectl_manifest" "custom-metrics-stackdriver-adapter" {
-  depends_on = [ kubernetes_service_account.custom-metrics-stackdriver-adapter ]
-  count = length(data.kubectl_filename_list.custom-metrics-stackdriver-adapter-manifests.matches)
-  yaml_body = file(element(data.kubectl_filename_list.custom-metrics-stackdriver-adapter-manifests.matches, count.index))
-}
+# resource "kubectl_manifest" "custom-metrics-stackdriver-adapter" {
+#   depends_on = [ kubernetes_service_account.custom-metrics-stackdriver-adapter ]
+#   count = length(data.kubectl_filename_list.custom-metrics-stackdriver-adapter-manifests.matches)
+#   yaml_body = file(element(data.kubectl_filename_list.custom-metrics-stackdriver-adapter-manifests.matches, count.index))
+# }

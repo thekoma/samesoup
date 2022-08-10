@@ -57,17 +57,16 @@ module "rehost-mig" {
 
 
 #GKE
-# module "replatform" {
-#   source                  = "./modules/replatform"
-#   network_name            = var.network_name
-#   primary-zone            = var.primary-zone
-#   project_id              = module.project-factory.project_id
-#   ip_range_pods_name      = var.ip_range_pods_name
-#   ip_range_services_name  = var.ip_range_services_name
-#   gke_cluster_name        = "replatform"
-#   # depends_on        = [module.enabled_google_apis]
-#   module_depends_on       = [ module.policies, google_sql_database.app-db, google_storage_bucket.utils, google_compute_network.main-network ]
-# }
+module "replatform" {
+  source                  = "./modules/replatform"
+  network_name            = var.network_name
+  primary-zone            = var.primary-zone
+  project_id              = module.project-factory.project_id
+  ip_range_pods_name      = var.ip_range_pods_name
+  ip_range_services_name  = var.ip_range_services_name
+  gke_cluster_name        = "replatform"
+  module_depends_on       = [ module.policies, google_sql_database.app-db, google_storage_bucket.utils, google_compute_network.main-network ]
+}
 
 module "dns" {
   source              = "./modules/dns"
@@ -76,4 +75,10 @@ module "dns" {
   dns_zone            = var.dns_zone
   rehost_endpoint     = module.rehost.instance_ip_addr
   rehost_mig_endpoint = module.rehost-mig.external_ip
+}
+
+
+module "anthos_repo" {
+  source              = "./modules/anthos_repo"
+  project_id          = var.dns_project_id # The name of the project that manages the zone
 }

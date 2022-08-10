@@ -17,3 +17,4 @@ frontend/src/__pycache__
 utils/services-generator/modules
 terraform/tfstate.tf
 terraform/backend.tf
+charts/custom-metrics
