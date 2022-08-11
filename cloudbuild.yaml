@@ -48,12 +48,15 @@ steps:
   - |
       cd terraform
       cat <<EOF > terraform.tfvars
-        project_name=$_PROJECT_NAME
-        org_id=$_ORG_ID
-        dns_project_id=$_DNS_PROJECT__ID
-        billing_account=$_BILLING_ACCOUNT
-        folder_id=$_FOLDER_ID
+        # Vars
+        project_name="$_PROJECT_NAME"
+        org_id="$_ORG_ID"
+        dns_project_id="$_DNS_PROJECT__ID"
+        billing_account="$_BILLING_ACCOUNT"
+        folder_id="$_FOLDER_ID"
+
       EOF
+      cat terraform.tfvars
 - id: 'tf init'
   name: 'gcr.io/seed-project-31337/github.com/thekoma/terraform-gcloud:latest'
   entrypoint: 'sh'
