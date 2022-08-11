@@ -16,7 +16,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'N1_HIGHCPU_8'
 steps:
-- id: 'branch name'
+- id: 'Setup Instance'
   name: 'alpine'
   entrypoint: 'sh'  
   args: 
@@ -24,6 +24,9 @@ steps:
   - | 
       echo "***********************"
       echo "$BRANCH_NAME"
+      service_account=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email" -H "Metadata-Flavor: Google")
+      git config --global user.name $service_account
+      git config --global user.email $service_account
       echo "***********************"
 - id: 'prepare backend settings'
   name: 'alpine'
