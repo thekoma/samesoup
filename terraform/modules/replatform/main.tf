@@ -20,7 +20,7 @@ data "google_project" "project" {
 
 data "google_client_openid_userinfo" "self" {
 }
-data "google_compute_network" "main-network" {
+data "google_compute_network" "main_network" {
   name = var.network_name
   project = var.project_id
 }
@@ -30,7 +30,7 @@ resource "google_compute_subnetwork" "gke" {
   name          = "replatform"
   ip_cidr_range = var.subnet_ip
   region        = var.region
-  network       = data.google_compute_network.main-network.id
+  network       = data.google_compute_network.main_network.id
   secondary_ip_range {
     range_name    = var.ip_range_services_name
     ip_cidr_range = var.svcs_subnet_ip
@@ -90,11 +90,11 @@ resource "google_gke_hub_feature_membership" "soup_cluster" {
     config_sync {
       source_format = "unstructured"
       git {
-        sync_repo   = google_sourcerepo_repository.anthos-repo.url
+        sync_repo   = google_sourcerepo_repository.anthos_repo.url
         sync_branch = var.sync_branch
         policy_dir  = var.policy_dir
         secret_type = "gcpserviceaccount"
-        gcp_service_account_email = google_service_account.repo-admin.email
+        gcp_service_account_email = google_service_account.repo_admin.email
       }
     }
     policy_controller {
@@ -105,22 +105,22 @@ resource "google_gke_hub_feature_membership" "soup_cluster" {
   }
 }
 
-resource "google_service_account_iam_binding" "enable-anthos-to-sa" {
-  service_account_id = google_service_account.repo-admin.id
+resource "google_service_account_iam_binding" "enable_anthos_to_sa" {
+  service_account_id = google_service_account.repo_admin.id
   role               = "roles/iam.workloadIdentityUser"
   members = [ "serviceAccount:${var.project_id}.svc.id.goog[config-management-system/root-reconciler]" ]
 }
 
-resource "google_service_account" "repo-admin" {
+resource "google_service_account" "repo_admin" {
   project       = var.project_id
-  account_id    = "repo-admin"
+  account_id    = "anthos-repo-admin"
   display_name  = "Service Account for the webapp"
 }
 
-resource "google_project_iam_member" "permit-anthos-reader" {
+resource "google_project_iam_member" "repo_admin_role" {
   project = var.project_id
   role    = "roles/source.admin"
-  member  = "serviceAccount:${google_service_account.repo-admin.email}"
+  member  = "serviceAccount:${google_service_account.repo_admin.email}"
 }
 
 data "google_client_config" "default" {}

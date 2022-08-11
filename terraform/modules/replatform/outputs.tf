@@ -6,9 +6,9 @@
 #   value = data.tls_public_key.repo-admin-pub-key.public_key_openssh
 # }
 output "sync_repo" {
-  value = google_sourcerepo_repository.anthos-repo.url
+  value = google_sourcerepo_repository.anthos_repo.url
 }
 
 output "sync_sa" {
-  value = google_service_account.repo-admin.id
+  value = google_service_account.repo_admin.id
 }
