@@ -6,8 +6,13 @@
     project_git: "{{ lookup('ansible.builtin.env', 'PROJECT_GIT', default=Undefined)}}"
     project_id: "{{ lookup('ansible.builtin.env', 'PROJECT_ID', default=Undefined)}}"
   tasks:
-    - fail:
-      when: not template_git or not project_git
+    - name: Fail When variables are missing
+      fail:
+      when:
+        not template_git or \
+        not project_git or \
+        not project_id or \
+        not template_path
     - debug:
         msg: "Hello"
     - name: Create temporary build directory
