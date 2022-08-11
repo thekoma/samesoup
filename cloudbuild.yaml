@@ -16,34 +16,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'N1_HIGHCPU_8'
 steps:
-- id: 'Setup Instance'
-  name: 'alpine'
-  entrypoint: 'sh'  
-  args: 
-  - '-c'
-  - | 
-      echo "***********************"
-      echo "$BRANCH_NAME"
-      service_account=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email" -H "Metadata-Flavor: Google")
-      git config --global user.name $service_account
-      git config --global user.email $service_account
-      echo "***********************"
-- id: 'prepare backend settings'
-  name: 'alpine'
-  entrypoint: 'sh'  
-  args: 
-  - '-c'
-  - | 
-      cd terraform
-      cat <<EOF > backend.tf
-        terraform {
-          backend "gcs" {
-            bucket  = "$_TFSTATE_BUCKET"
-            prefix  = "terraform/state-$PROJECT_ID"
-          }
-        }
-      EOF
-- id: 'prepare vars'
+- id: 'prepare Files'
   name: 'alpine'
   entrypoint: 'sh'
   args:
@@ -57,9 +30,15 @@ steps:
         dns_project_id="$_DNS_PROJECT__ID"
         billing_account="$_BILLING_ACCOUNT"
         folder_id="$_FOLDER_ID"
-
       EOF
-      cat terraform.tfvars
+      cat <<EOF > backend.tf
+        terraform {
+          backend "gcs" {
+            bucket  = "$_TFSTATE_BUCKET"
+            prefix  = "terraform/state-$PROJECT_ID"
+          }
+        }
+      EOF
 - id: 'tf init'
   name: 'gcr.io/seed-project-31337/github.com/thekoma/terraform-gcloud:latest'
   entrypoint: 'sh'
@@ -68,6 +47,9 @@ steps:
   - |
       echo ""
       echo "*************** TERRAFORM INIT ******************"
+      service_account=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email" -H "Metadata-Flavor: Google")
+      git config --global user.name $service_account
+      git config --global user.email $service_account
       cd terraform
       terraform init -no-color || exit 1
 # [START tf-plan]
