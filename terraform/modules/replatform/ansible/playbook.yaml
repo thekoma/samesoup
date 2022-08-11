@@ -1,4 +1,5 @@
-- hosts: 127.0.0.1
+- hosts: 
+  - localhost
   vars:
     template_git: "{{ lookup('ansible.builtin.env', 'TEMPLATE_GIT', default=Undefined)}}"
     template_path: "{{ lookup('ansible.builtin.env', 'TEMPLATE_PATH', default=Undefined)}}"
