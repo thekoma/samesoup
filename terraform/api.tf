@@ -25,6 +25,7 @@ module "enabled_google_apis" {
     "cloudbuild.googleapis.com",
     "artifactregistry.googleapis.com",
     "gkehub.googleapis.com",
-    "appdevelopmentexperience.googleapis.com"
+    "appdevelopmentexperience.googleapis.com",
+    "sourcerepo.googleapis.com"
   ]
 }
