@@ -14,7 +14,7 @@
 
 options:
   logging: CLOUD_LOGGING_ONLY
-
+  machineType: 'N1_HIGHCPU_8'
 steps:
 - id: 'branch name'
   name: 'alpine'
