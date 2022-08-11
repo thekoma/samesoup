@@ -77,8 +77,7 @@ module "dns" {
   rehost_mig_endpoint = module.rehost-mig.external_ip
 }
 
-
-module "anthos_repo" {
-  source              = "./modules/anthos_repo"
-  project_id          = var.dns_project_id # The name of the project that manages the zone
-}
+# module "anthos_config" {
+#   source              = "./modules/anthos_config"
+#   project_id          = module.project-factory.project_id # The name of the project that manages the zone
+# }

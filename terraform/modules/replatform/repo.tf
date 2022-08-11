@@ -1,12 +1,7 @@
-data google_project "project" {
-  project_id = var.project_id
-}
-
 resource "google_sourcerepo_repository" "anthos-repo" {
   project = var.project_id
   name = "anthos-repo-${data.google_project.project.name}"
 }
-
 
 resource "null_resource" "align-repo-from-template" {
   triggers = {

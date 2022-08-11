@@ -9,8 +9,16 @@ terraform {
   }
 }
 
+provider "kubernetes" {
+  host                   = "https://${module.gke.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(module.gke.ca_certificate)
+}
 data "google_project" "project" {
   project_id = var.project_id
+}
+
+data "google_client_openid_userinfo" "self" {
 }
 data "google_compute_network" "main-network" {
   name = var.network_name
@@ -51,6 +59,9 @@ module "gke" {
   cluster_resource_labels = { "mesh_id" : "proj-${data.google_project.project.number}" }
 }
 
+output "pool_id" {
+  value = module.gke.identity_namespace
+}
 resource "google_gke_hub_membership" "soup" {
   membership_id = "soup-membership"
   project       = var.project_id
@@ -68,62 +79,48 @@ resource "google_gke_hub_feature" "feature" {
   provider = google-beta
 }
 
-# module "asm-primary" {
-#   source                = "terraform-google-modules/kubernetes-engine/google//modules/asm"
-#   # version               = "18.0.0"
-#   project_id            = var.project_id
-#   cluster_name          = module.gke.name
-#   location              = module.gke.location
-#   cluster_endpoint      = module.gke.endpoint
-#   enable_all            = true
-#   outdir                = "./asm-dir-${module.gke.name}"
-# }
+resource "google_gke_hub_feature_membership" "soup_cluster" {
+  project     = var.project_id
+  provider   = google-beta
+  location   = "global"
+  feature    = "configmanagement"
+  membership = google_gke_hub_membership.soup.membership_id
+  configmanagement {
+    #version = "1.8.0"
+    config_sync {
+      source_format = "unstructured"
+      git {
+        sync_repo   = google_sourcerepo_repository.anthos-repo.url
+        sync_branch = var.sync_branch
+        policy_dir  = var.policy_dir
+        secret_type = "gcpserviceaccount"
+        gcp_service_account_email = google_service_account.repo-admin.email
+      }
+    }
+    policy_controller {
+      enabled                    = true
+      template_library_installed = true
+      referential_rules_enabled  = true
+    }
+  }
+}
 
+resource "google_service_account_iam_binding" "enable-anthos-to-sa" {
+  service_account_id = google_service_account.repo-admin.id
+  role               = "roles/iam.workloadIdentityUser"
+  members = [ "serviceAccount:${var.project_id}.svc.id.goog[config-management-system/root-reconciler]" ]
+}
 
-resource "google_service_account" "metrics" {
+resource "google_service_account" "repo-admin" {
   project       = var.project_id
-  account_id    = "metrics-driver"
-  display_name  = "Service Account for the metrics"
+  account_id    = "repo-admin"
+  display_name  = "Service Account for the webapp"
 }
 
-provider "kubernetes" {
-  host                   = "https://${module.gke.endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(module.gke.ca_certificate)
-}
-
-provider "kubectl" {
-  host                   = "https://${module.gke.endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(module.gke.ca_certificate)
-  alias = "replatform"
+resource "google_project_iam_member" "permit-anthos-reader" {
+  project = var.project_id
+  role    = "roles/source.admin"
+  member  = "serviceAccount:${google_service_account.repo-admin.email}"
 }
 
 data "google_client_config" "default" {}
-
-# resource "kubernetes_namespace" "custom-metrics" {
-#   metadata {
-#     name = "custom-metrics"
-#   }
-# }
-
-# resource "kubernetes_service_account" "custom-metrics-stackdriver-adapter" {
-#   depends_on = [ kubernetes_namespace.custom-metrics ]
-#   metadata {
-#     name        = "custom-metrics-stackdriver-adapter"
-#     namespace   = "custom-metrics"
-#     annotations = {
-#       "iam.gke.io/gcp-service-account" = "metrics-driver@${var.project_id}.iam.gserviceaccount.com"
-#     }
-#   }
-# }
-
-# data "kubectl_filename_list" "custom-metrics-stackdriver-adapter-manifests" {
-#   pattern = "${path.module}/manifests/custom-metrics/*.yaml"
-# }
-
-# resource "kubectl_manifest" "custom-metrics-stackdriver-adapter" {
-#   depends_on = [ kubernetes_service_account.custom-metrics-stackdriver-adapter ]
-#   count = length(data.kubectl_filename_list.custom-metrics-stackdriver-adapter-manifests.matches)
-#   yaml_body = file(element(data.kubectl_filename_list.custom-metrics-stackdriver-adapter-manifests.matches, count.index))
-# }

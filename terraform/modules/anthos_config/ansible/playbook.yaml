@@ -46,3 +46,10 @@
         mode: '{{ item.mode }}'
       with_community.general.filetree: "{{workdir.path}}/template/{{template_path}}"
       when: item.state == 'link'
+
+    - name: Commit changes #This thing should fail in cloudbuild
+      shell: |
+          cd  "{{workdir.path}}/project" && \
+          git add . && \
+          if [ $(git status --porcelain|wc -l) -gt 0 ];then git commit -am "Refresh {{ansible_date_time.iso8601}}"; fi && \
+          git push origin master

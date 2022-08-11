@@ -81,3 +81,44 @@ variable "gke_cluster_name" {
 }
 
 
+variable "sync_branch" {
+  type = string
+  nullable = true
+  default = "master"
+}
+
+
+variable "policy_dir" {
+  type = string
+  nullable = true
+  default = "./"
+}
+variable "kanboard_sa_name" {
+  type = string
+  default = "kanboard"
+}
+variable "kanboard_namespace" {
+  type = string
+  default = "kanboard"
+}
+variable "kanboard_k8s_sa_name" {
+  type = string
+  default = "kanboard"
+}
+
+
+variable "service_account" {
+  type     = string
+  nullable = true
+  default  = "soup"
+}
+
+variable "template_git" {
+  type = string
+  default = "https://github.com/thekoma/samesoup"
+}
+
+variable "template_path" {
+  type = string
+  default = "anthos_template"
+}
