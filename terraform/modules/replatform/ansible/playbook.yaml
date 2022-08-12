@@ -19,7 +19,10 @@
       ansible.builtin.git:
         repo: "{{ template_git }}"
         dest: "{{workdir.path}}/template"
-        bare: true
+    - name: Remove Git Files
+      file:
+        path: "{{workdir.path}}/template/.git"
+        state: absent
     - name: Clone Project Repo
       shell: |
           gcloud source repos clone {{ project_git }} {{workdir.path}}/project --project={{ project_id }} 
