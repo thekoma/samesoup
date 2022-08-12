@@ -22,6 +22,8 @@ resource "null_resource" "align_repo_from_template" {
         CUSTOM_METRICS_SA = "${google_service_account.metrics_adapter.email}"
         KANBOARD_SA = "${data.google_service_account.replatform.email}"
         REPO_SA = "${google_service_account.repo_admin.email}"
+        EXTERNAL_SECRET_PATH="secondary/external-secrets"
+        EXTERNAL_KANBOARD_PATH="secondary/kanboard"
       }
   }
 }

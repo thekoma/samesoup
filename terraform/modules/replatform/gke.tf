@@ -16,12 +16,12 @@ resource "google_compute_subnetwork" "gke" {
 }
 
 module "gke" {
-  # version                     = "~> 22.0"
+  version                     = "~> 22.1"
   source                      = "terraform-google-modules/kubernetes-engine/google"
   project_id                  = var.project_id
   name                        = var.gke_cluster_name
   region                      = var.region
-  release_channel             = "STABLE"
+  release_channel             = "REGULAR"
   enable_shielded_nodes       = true
   remove_default_node_pool    = false
   network                     = var.network_name
@@ -31,7 +31,6 @@ module "gke" {
   identity_namespace          = "${var.project_id}.svc.id.goog"
   cluster_resource_labels = { "mesh_id" : "proj-${data.google_project.project.number}" }
 }
-
 
 resource "google_gke_hub_membership" "soup" {
   membership_id = "soup-membership"
