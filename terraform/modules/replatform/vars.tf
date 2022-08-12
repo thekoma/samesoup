@@ -87,12 +87,6 @@ variable "sync_branch" {
   default = "master"
 }
 
-
-variable "policy_dir" {
-  type = string
-  nullable = true
-  default = "./"
-}
 variable "kanboard_sa_name_id" {
   type = string
   nullable = false
@@ -119,6 +113,11 @@ variable "template_git" {
 }
 
 variable "template_path" {
+  type = string
+  default = "./"
+}
+
+variable "template_path_mainrepo" {
   type = string
   default = "mainrepo"
 }

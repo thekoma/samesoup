@@ -139,5 +139,10 @@ variable "template_git" {
 
 variable "template_path" {
   type = string
+  default = "."
+}
+
+variable "template_path_mainrepo" {
+  type = string
   default = "mainrepo"
 }

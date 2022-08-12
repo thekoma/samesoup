@@ -63,7 +63,7 @@ resource "google_gke_hub_feature_membership" "soup_cluster" {
       git {
         sync_repo   = google_sourcerepo_repository.anthos_repo.url
         sync_branch = var.sync_branch
-        policy_dir  = var.policy_dir
+        policy_dir  = var.template_path_mainrepo
         secret_type = "gcpserviceaccount"
         gcp_service_account_email = google_service_account.repo_admin.email
       }

@@ -6,10 +6,10 @@ resource "google_sourcerepo_repository" "anthos_repo" {
 resource "null_resource" "align_repo_from_template" {
   triggers = {
     # Trigger wlways
-    # always_run = "${timestamp()}"
+    always_run = "${timestamp()}"
 
     # Trigger only on playbook changes
-    dir_sha1 = sha1(join("", [for f in fileset("${path.module}/ansible", "**"): filesha1("${path.module}/ansible/${f}")]))
+    # dir_sha1 = sha1(join("", [for f in fileset("${path.module}/ansible", "**"): filesha1("${path.module}/ansible/${f}")]))
   }
 
   provisioner "local-exec" {
