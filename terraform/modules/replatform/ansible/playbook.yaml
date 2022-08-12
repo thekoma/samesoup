@@ -5,16 +5,8 @@
     template_path: "{{ lookup('ansible.builtin.env', 'TEMPLATE_PATH', default=Undefined)}}"
     project_git: "{{ lookup('ansible.builtin.env', 'PROJECT_GIT', default=Undefined)}}"
     project_id: "{{ lookup('ansible.builtin.env', 'PROJECT_ID', default=Undefined)}}"
+    custom_metrics_sa: "{{ lookup('ansible.builtin.env', 'CUSTOM_METRICS_SA', default=Undefined)}}"
   tasks:
-    - name: Fail When variables are missing
-      fail:
-      when:
-        not template_git or \
-        not project_git or \
-        not project_id or \
-        not template_path
-    - debug:
-        msg: "Hello"
     - name: Create temporary build directory
       ansible.builtin.tempfile:
         state: directory
@@ -32,7 +24,7 @@
         path: "{{workdir.path}}/project/{{ item.path }}"
         state: directory
         mode: '{{ item.mode }}'
-      with_community.general.filetree: "{{workdir.path}}/template/{{template_path}}"
+      with_community.general.filetree: "{{workdir.path}}/template/{{template_path}}/"
       when: item.state == 'directory'
 
     - name: Template files
@@ -40,7 +32,7 @@
         src: '{{ item.src }}'
         dest: "{{workdir.path}}/project/{{ item.path }}"
         mode: '{{ item.mode }}'
-      with_community.general.filetree: "{{workdir.path}}/template/{{template_path}}"
+      with_community.general.filetree: "{{workdir.path}}/template/{{template_path}}/"
       when: item.state == 'file'
 
     - name: Recreate symlinks
@@ -50,7 +42,7 @@
         state: link
         force: yes
         mode: '{{ item.mode }}'
-      with_community.general.filetree: "{{workdir.path}}/template/{{template_path}}"
+      with_community.general.filetree: "{{workdir.path}}/template/{{template_path}}/"
       when: item.state == 'link'
 
     - name: Commit changes #This thing should fail in cloudbuild

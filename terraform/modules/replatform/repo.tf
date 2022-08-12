@@ -14,6 +14,7 @@ resource "null_resource" "align_repo_from_template" {
         TEMPLATE_PATH = "${var.template_path}"
         PROJECT_GIT = "${google_sourcerepo_repository.anthos_repo.name}"
         PROJECT_ID = "${var.project_id}"
+        CUSTOM_METRICS_SA = "${google_service_account.custom_metrics.email}"
       }
   }
 }
