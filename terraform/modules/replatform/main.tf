@@ -26,3 +26,8 @@ data "google_compute_network" "main_network" {
 }
 
 data "google_client_config" "default" {}
+
+
+data "google_service_account" "replatform" {
+  account_id = var.kanboard_sa_name_id
+}

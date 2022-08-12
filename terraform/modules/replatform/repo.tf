@@ -20,6 +20,8 @@ resource "null_resource" "align_repo_from_template" {
         PROJECT_GIT = "${google_sourcerepo_repository.anthos_repo.name}"
         PROJECT_ID = "${var.project_id}"
         CUSTOM_METRICS_SA = "${google_service_account.metrics_adapter.email}"
+        KANBOARD_SA = "${data.google_service_account.replatform.email}"
+        REPO_SA = "${google_service_account.repo_admin.email}"
       }
   }
 }

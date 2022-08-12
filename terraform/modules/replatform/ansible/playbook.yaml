@@ -5,7 +5,9 @@
     template_path: "{{ lookup('ansible.builtin.env', 'TEMPLATE_PATH', default=Undefined)}}"
     project_git: "{{ lookup('ansible.builtin.env', 'PROJECT_GIT', default=Undefined)}}"
     project_id: "{{ lookup('ansible.builtin.env', 'PROJECT_ID', default=Undefined)}}"
+    repo_sa: "{{ lookup('ansible.builtin.env', 'REPO_SA', default=Undefined)}}"
     custom_metrics_sa: "{{ lookup('ansible.builtin.env', 'CUSTOM_METRICS_SA', default=Undefined)}}"
+    external_secret_path: "{{ lookup('ansible.builtin.env', 'EXTERNAL_SECRET_PATH', default=Undefined)}}"
   tasks:
     - name: Create temporary build directory
       ansible.builtin.tempfile:

@@ -93,9 +93,9 @@ variable "policy_dir" {
   nullable = true
   default = "./"
 }
-variable "kanboard_sa_name" {
+variable "kanboard_sa_name_id" {
   type = string
-  default = "kanboard"
+  nullable = false
 }
 variable "kanboard_namespace" {
   type = string
@@ -120,5 +120,5 @@ variable "template_git" {
 
 variable "template_path" {
   type = string
-  default = "."
+  default = "mainrepo"
 }
