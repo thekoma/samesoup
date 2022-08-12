@@ -88,7 +88,7 @@ resource "google_gke_hub_feature_membership" "soup_cluster" {
   configmanagement {
     #version = "1.8.0"
     config_sync {
-      source_format = "unstructured"
+      source_format = "hierarchy"
       git {
         sync_repo   = google_sourcerepo_repository.anthos_repo.url
         sync_branch = var.sync_branch
