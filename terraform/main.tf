@@ -66,6 +66,8 @@ module "replatform" {
   ip_range_services_name  = var.ip_range_services_name
   gke_cluster_name        = "replatform"
   module_depends_on       = [ module.policies, google_sql_database.app-db, google_storage_bucket.utils, google_compute_network.main-network ]
+  template_git            = var.template_git
+  template_path           = var.template_path
 }
 
 module "dns" {

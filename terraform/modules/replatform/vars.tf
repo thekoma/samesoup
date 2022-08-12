@@ -115,10 +115,10 @@ variable "service_account" {
 
 variable "template_git" {
   type = string
-  default = "https://github.com/thekoma/samesoup"
+  default = "https://github.com/thekoma/samesoup-configsync"
 }
 
 variable "template_path" {
   type = string
-  default = "anthos_template"
+  default = "."
 }

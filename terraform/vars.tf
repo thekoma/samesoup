@@ -130,3 +130,14 @@ locals {
 locals {
   rehost_mig_domain = "rehost-mig.${local.dns_basename}"
 }
+
+
+variable "template_git" {
+  type = string
+  default = "https://github.com/thekoma/samesoup-configsync"
+}
+
+variable "template_path" {
+  type = string
+  default = "."
+}
