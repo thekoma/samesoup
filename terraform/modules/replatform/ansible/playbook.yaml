@@ -11,10 +11,18 @@
       ansible.builtin.tempfile:
         state: directory
       register: workdir
+    - name: Check that the environment is clean
+      file:
+        path: "{{workdir.path}}/template"
+      status: absent
     - name: Clone Template Repo
       ansible.builtin.git:
         repo: "{{ template_git }}"
         dest: "{{workdir.path}}/template"
+    - name: Remove Git Files
+      file:
+        path: "{{workdir.path}}/template/.git"
+      status: absent
     - name: Clone Project Repo
       shell: |
           gcloud source repos clone {{ project_git }} {{workdir.path}}/project --project={{ project_id }} 
