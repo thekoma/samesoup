@@ -14,7 +14,7 @@
     - name: Check that the environment is clean
       file:
         path: "{{workdir.path}}/template"
-      status: absent
+        state: absent
     - name: Clone Template Repo
       ansible.builtin.git:
         repo: "{{ template_git }}"
