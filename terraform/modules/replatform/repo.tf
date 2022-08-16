@@ -24,7 +24,7 @@ resource "null_resource" "align_repo_from_template" {
         REPO_SA = "${google_service_account.repo_admin.email}"
         EXTERNAL_SECRET_PATH="secondary/external-secrets"
         EXTERNAL_KANBOARD_PATH="secondary/kanboard"
-        SSL_DOMAIN="replatform.${local.basename}"
+        SSL_DOMAIN="replatform.${local.basename}|sed 's/\\.$//g'"
         KANBOARD_IMAGE="${var.region}-docker.pkg.dev/${var.project_id}/${var.project_id}/kanboard"
         KANBOARD_TAG="latest"
       }
