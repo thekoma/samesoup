@@ -28,3 +28,29 @@ resource "null_resource" "align_repo_from_template" {
       }
   }
 }
+
+resource "google_artifact_registry_repository" "demo-repo" {
+  project       = module.project-factory.project_id
+  depends_on    = [module.enabled_google_apis]
+  provider      = google-beta
+  location      = var.region
+  repository_id = var.project_id
+  description   = "Demo Registry"
+  format        = "DOCKER"
+}
+
+
+
+resource "google_cloudbuild_trigger" "build-kanboard-image" {
+  depends_on = [ null_resource.align_repo_from_template, google_artifact_registry_repository.demo-repo ]
+  project = var.project_id
+  name = "kanboard-build-trigger"
+  trigger_template {
+    branch_name = "master"
+    repo_name   = google_sourcerepo_repository.anthos_repo.name
+  }
+  substitutions = {
+      _REGISTRY = "${var.region}-docker.pkg.dev/${var.project_id}/${var.project_id}"
+  }
+  filename = "cloudbuild.yaml"
+}

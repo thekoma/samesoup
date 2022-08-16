@@ -10,7 +10,7 @@ resource "google_storage_bucket" "utils" {
 resource "google_storage_bucket_object" "gcs_content" {
   for_each = fileset("${path.module}/../gcs_content", "**")
   bucket   = google_storage_bucket.utils.name
-  name     = "${each.key}"
+  name     = each.key
   source   = "${path.module}/../gcs_content/${each.key}"
 }
 

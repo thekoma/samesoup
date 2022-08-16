@@ -1,7 +1,3 @@
-locals {
-  sql-networks = [ var.subnet_ip, var.pods_subnet_ip, var.svcs_subnet_ip ]
-}
-
 resource "google_sql_database_instance" "app-db" {
   name                = local.postgres_db_name
   project             = module.project-factory.project_id
