@@ -30,8 +30,7 @@ resource "null_resource" "align_repo_from_template" {
 }
 
 resource "google_artifact_registry_repository" "demo-repo" {
-  project       = module.project-factory.project_id
-  depends_on    = [module.enabled_google_apis]
+  project       = var.project_id
   provider      = google-beta
   location      = var.region
   repository_id = var.project_id
