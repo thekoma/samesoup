@@ -11,6 +11,10 @@
     external_kanboard_path: "{{ lookup('ansible.builtin.env', 'EXTERNAL_KANBOARD_PATH', default='secondary/kanboard')}}"
     kanboard_sa: "{{ lookup('ansible.builtin.env', 'KANBOARD_SA', default=Undefined)}}"
     ssl_domain: "{{ lookup('ansible.builtin.env', 'SSL_DOMAIN', default=Undefined)}}"
+    kanboard_image: "{{ lookup('ansible.builtin.env', 'KANBOARD_IMAGE', default=Undefined)}}"
+    kanboard_tag: "{{ lookup('ansible.builtin.env', 'KANBOARD_TAG', default='latest')}}"
+
+
   tasks:
     - name: Create temporary build directory
       ansible.builtin.tempfile:

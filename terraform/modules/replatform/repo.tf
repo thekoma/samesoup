@@ -25,6 +25,8 @@ resource "null_resource" "align_repo_from_template" {
         EXTERNAL_SECRET_PATH="secondary/external-secrets"
         EXTERNAL_KANBOARD_PATH="secondary/kanboard"
         SSL_DOMAIN="replatform.${local.basename}"
+        KANBOARD_IMAGE="${var.region}-docker.pkg.dev/${var.project_id}/${var.project_id}/kanboard"
+        KANBOARD_TAG="latest"
       }
   }
 }
@@ -38,8 +40,6 @@ resource "google_artifact_registry_repository" "demo-repo" {
   format        = "DOCKER"
 }
 
-
-
 resource "google_cloudbuild_trigger" "build-kanboard-image" {
   depends_on = [ null_resource.align_repo_from_template, google_artifact_registry_repository.demo-repo ]
   project = var.project_id
@@ -52,4 +52,20 @@ resource "google_cloudbuild_trigger" "build-kanboard-image" {
       _REGISTRY = "${var.region}-docker.pkg.dev/${var.project_id}/${var.project_id}"
   }
   filename = "cloudbuild.yaml"
+}
+
+data google_service_account "gke_svc_account" {
+  project = var.project_id
+  account_id = module.gke.service_account
+}
+
+resource "google_artifact_registry_repository_iam_binding" "pull-permissions" {
+  project = var.project_id
+  location = var.region
+  repository = google_artifact_registry_repository.demo-repo.name
+  role = "roles/artifactregistry.reader"
+  members = [
+    "serviceAccount:${data.google_service_account.replatform.email}",
+    "serviceAccount:${data.google_service_account.gke_svc_account.email}"
+  ]
 }
