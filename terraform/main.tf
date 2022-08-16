@@ -70,7 +70,13 @@ module "replatform" {
   template_path           = var.template_path
   template_path_mainrepo  = var.template_path_mainrepo
   kanboard_sa_name_id     = google_service_account.replatform.id
+  dns_zone                = var.dns_zone
+  dns_project_id          = var.dns_project_id
+  prefix_name             = var.project_name
 }
+
+
+
 
 module "dns" {
   source              = "./modules/dns"

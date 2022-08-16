@@ -121,3 +121,19 @@ variable "template_path_mainrepo" {
   type = string
   default = "mainrepo"
 }
+
+
+variable "dns_project_id" {
+  type = string
+  nullable = false
+}
+
+variable "dns_zone" {
+  type = string
+  nullable = false
+}
+
+variable "prefix_name" {
+  type = string
+  nullable = false
+}

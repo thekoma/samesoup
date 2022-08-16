@@ -9,6 +9,7 @@
     custom_metrics_sa: "{{ lookup('ansible.builtin.env', 'CUSTOM_METRICS_SA', default=Undefined)}}"
     external_secret_path: "{{ lookup('ansible.builtin.env', 'EXTERNAL_SECRET_PATH', default='secondary/external-secrets')}}"
     external_kanboard_path: "{{ lookup('ansible.builtin.env', 'EXTERNAL_KANBOARD_PATH', default='secondary/kanboard')}}"
+    kanboard_sa: "{{ lookup('ansible.builtin.env', 'KANBOARD_SA', default=Undefined)}}"
   tasks:
     - name: Create temporary build directory
       ansible.builtin.tempfile:
@@ -28,7 +29,7 @@
         state: absent
     - name: Clone Project Repo
       shell: |
-          gcloud source repos clone {{ project_git }} {{workdir.path}}/project --project={{ project_id }} 
+          gcloud source repos clone {{ project_git }} {{workdir.path}}/project --project={{ project_id }}
 
     - name: Create directories
       file:

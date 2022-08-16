@@ -22,11 +22,15 @@ KEYS=(
 
 function getvalue() {
     SECRET_ID=$1
-    curl -s "https://secretmanager.googleapis.com/v1/projects/${PROJECT_ID}/secrets/${SECRET_ID}/versions/latest:access" \
+    PAYLOAD=$(curl -s "https://secretmanager.googleapis.com/v1/projects/${PROJECT_ID}/secrets/${SECRET_ID}/versions/latest:access" \
     --request "GET" \
     --header "authorization: Bearer ${TOKEN}" \
-    --header "content-type: application/json" \
-    | jq -r ".payload.data" | base64 -d
+    --header "content-type: application/json"|jq -r ".payload.data")
+    if [[ "${PAYLOAD}" != "" ]]; then
+      echo $PAYLOAD|base64 -d
+    else
+      exit 99
+    fi
 }
 
 function setvalue() {
