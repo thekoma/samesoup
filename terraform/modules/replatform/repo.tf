@@ -24,6 +24,7 @@ resource "null_resource" "align_repo_from_template" {
         REPO_SA = "${google_service_account.repo_admin.email}"
         EXTERNAL_SECRET_PATH="secondary/external-secrets"
         EXTERNAL_KANBOARD_PATH="secondary/kanboard"
+        SSL_DOMAIN="replatform.${local.basename}"
       }
   }
 }
