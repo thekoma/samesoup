@@ -17,8 +17,8 @@ output config_php {
   value = data.template_file.config_php.rendered
 }
 
-output config_php_secret_id {
-  value = var.config_php_secret_id
+output php_config_secret_id {
+  value = var.php_config_secret_id
 }
 
 output gcs_repo_url_secret_id {

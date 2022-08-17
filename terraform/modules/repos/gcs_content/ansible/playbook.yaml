@@ -202,7 +202,7 @@
         recurse: yes
 
     - name: gather config.php
-      shell: gcloud secrets versions access  latest --secret="config_php"
+      shell: gcloud secrets versions access  latest --secret="{{php_config_secret_id}}"
       register: config_php
 
     - name: write config.php

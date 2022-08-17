@@ -42,7 +42,7 @@ module "rehost" {
   gcs_repo_url_secret_id  = module.repos.gcs_repo_url_secret_id
   gcs_repo_name           = module.repos.gcs_repo_name
   gcs_repo_name_secret_id = module.repos.gcs_repo_name_secret_id
-  php_config_secret_id    = module.repos.config_php_secret_id
+  php_config_secret_id    = module.repos.php_config_secret_id
 
   dns_zone                = var.dns_zone
   dns_project_id          = var.dns_project_id

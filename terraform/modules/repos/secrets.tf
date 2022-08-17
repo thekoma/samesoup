@@ -1,6 +1,6 @@
 resource "google_secret_manager_secret" "config_php" {
   project = var.project_id
-  secret_id = var.config_php_secret_id
+  secret_id = var.php_config_secret_id
   replication {
     automatic = true
   }

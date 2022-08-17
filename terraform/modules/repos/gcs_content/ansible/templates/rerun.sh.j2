@@ -11,6 +11,6 @@ tail --bytes=$(expr $(wc -c < ${fulllog}) - 104857600) ${fulllog} > ${fulllog}.t
 mv ${fulllog}.tmp ${fulllog}
 date +%F_%H-%M |tee -a "${lastlog}" "${fulllog}"
 gsutil -m cp -r "{{gcs_repo}}/ansible" /opt/installer |tee -a "${lastlog}" "${fulllog}"
-unbuffer ansible-playbook --diff -v /opt/installer/ansible/playbook.yaml --extra-vars "url={{url}} gcs_repo={{gcs_repo}}" |tee -a "${lastlog}" "${fulllog}"
+unbuffer ansible-playbook --diff -v /opt/installer/ansible/playbook.yaml --extra-vars "url={{url}} gcs_repo={{gcs_repo}} php_config_secret_id={{php_config_secret_id}}" |tee -a "${lastlog}" "${fulllog}"
 
 #EOF

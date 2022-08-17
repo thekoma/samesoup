@@ -70,7 +70,7 @@ variable "gcs_kanboard_svc_account_id" {
   default = "kanboard-gcs"
 }
 
-variable "config_php_secret_id" {
+variable "php_config_secret_id" {
   type = string
   nullable = true
   default = "config_php"
