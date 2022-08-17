@@ -89,8 +89,8 @@ module "mig-lb-https" {
   version                         = "~> 6.3"
   name                            = "mig-lb-https"
   project                         = var.project_id
-  target_tags                     = [ data.google_compute_network.main-network.name  ]
-  firewall_networks               = [ data.google_compute_network.main-network.name ]
+  target_tags                     = [ data.google_compute_network.main_network.name  ]
+  firewall_networks               = [ data.google_compute_network.main_network.name ]
   ssl                             = true
   use_ssl_certificates            = false
   managed_ssl_certificate_domains = var.lb_ssl_domains

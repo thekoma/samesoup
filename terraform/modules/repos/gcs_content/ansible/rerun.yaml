@@ -1,4 +1,6 @@
 ---
+#-extra-vars "url=${locals.rehost_record} gcs_repo=${var.gcs_repo_url}"
+# url gcs_repo
 - name: "Configure host"
   hosts: 127.0.0.1
   connection: local

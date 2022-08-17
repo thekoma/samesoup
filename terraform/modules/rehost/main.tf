@@ -1,28 +1,31 @@
-data "google_service_account" "rehost" {
-  account_id = var.service_account_id
-}
+# # I need a SVC account in IAM that has the right roles to work with the repository
 
+
+resource "google_compute_address" "rehost" {
+  name = "rehost-ip"
+}
 resource "google_compute_instance" "rehost" {
-  name          = "rehost"
-  machine_type  = "e2-medium"
-  zone          = var.primary-zone
+  depends_on = [ google_secret_manager_secret_iam_member.php_config_secret_id ]
+  name          = var.vm_name
+  machine_type  = var.machine_type
+  zone          = var.zone
   project       = var.project_id
   allow_stopping_for_update = true
   service_account {
-    email  = data.google_service_account.rehost.email
-    scopes = ["compute-ro", "storage-rw", "logging-write", "monitoring-write", "service-control", "service-management", "pubsub", "trace", "cloud-platform"]
+    email  = google_service_account.rehost.email
+    scopes = var.scopes
   }
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2204-lts"
-      size = "100"
+      image = var.image_flavor
+      size  = var.boot_disk_size
     }
   }
   network_interface {
     network     = var.network
     subnetwork  = var.subnetwork
     access_config {
-      // Ephemeral public IP
+      nat_ip = google_compute_address.rehost.address
     }
   }
 
@@ -39,10 +42,10 @@ resource "google_compute_instance" "rehost" {
               local_tmp      = /tmp
         runcmd:
         - mkdir -p /opt/installer/logs
-        - gsutil cp -r ${var.gcs_ansible_url} /opt/installer
+        - gsutil cp -r ${var.gcs_repo_url} /opt/installer
         - ansible-galaxy collection install community.postgresql maxhoesel.caddy community.general
         - ansible-galaxy install googlecloudplatform.google_cloud_ops_agents
-        - ansible-playbook /opt/installer/ansible/rerun.yaml
+        - ansible-playbook /opt/installer/ansible/rerun.yaml -extra-vars "url=${local.rehost_record} gcs_repo=${var.gcs_repo_url}"
         - sh -c /opt/installer/rerun.sh
       EOT
   }
@@ -51,6 +54,3 @@ resource "google_compute_instance" "rehost" {
 }
 
 
-output "instance_ip_addr" {
-  value = google_compute_instance.rehost.network_interface.0.access_config.0.nat_ip
-}

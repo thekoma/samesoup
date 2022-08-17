@@ -1,3 +1,8 @@
+variable "gcp_creds" {
+  type        = string
+  description = "GCP authentication file"
+  default = "credentials.json"
+}
 variable "project_name" {
   type     = string
   nullable = false
@@ -12,7 +17,6 @@ variable "dns_project_id" {
   type     = string
   nullable = false
 }
-
 
 variable "dns_zone" {
   type     = string
@@ -30,14 +34,23 @@ variable "folder_id" {
   nullable = true
 }
 
-variable "network_name" {
+#### Generic variables
+
+variable "project_id" {
   type     = string
-  default = "default"
+  nullable = true
+  default = null
 }
 
-variable "subnetwork" {
-  type     = string
-  default = "default"
+
+resource "random_string" "project_suffix" {
+  length           = 5
+  special          = false
+  lower            = true
+  upper            = false
+}
+locals {
+  project_id = var.project_id == null ? "${var.project_name}-${random_string.project_suffix.result}" : var.project_id
 }
 
 variable "region" {
@@ -55,57 +68,64 @@ variable "primary-zone" {
   default = "us-central1-a"
 }
 
-variable "ip_range_pods_name" {
+
+#### Network Module
+variable "network_name" {
   type     = string
-  default = "pods"
+  default = "default"
 }
 
-variable "ip_range_services_name" {
+variable "dns_prefix" {
   type     = string
-  default = "svcs"
-}
-
-resource "random_string" "suffix" {
-  length           = 5
-  special          = false
-  lower            = true
-  upper            = false
-}
-
-variable "gcp_creds" {
-  type     = string
-  default = "./credentials.json"
-}
-
-locals {
-  postgres_db_name = "demoapp"
-}
-
-locals {
-  postgres_user = "demoapp"
+  default = "soup"
 }
 
 
-locals {
-  dns_basename = "${var.project_name}.${data.google_dns_managed_zone.soup.dns_name}"
-}
-
-locals {
-  rehost_mig_domain = "rehost-mig.${local.dns_basename}"
-}
 
 
-variable "template_git" {
-  type = string
-  default = "https://github.com/thekoma/samesoup-configsync"
-}
+# variable "ip_range_pods_name" {
+#   type     = string
+#   default = "pods"
+# }
 
-variable "template_path" {
-  type = string
-  default = "."
-}
+# variable "ip_range_services_name" {
+#   type     = string
+#   default = "svcs"
+# }
 
-variable "template_path_mainrepo" {
-  type = string
-  default = "mainrepo"
-}
+
+
+
+
+# locals {
+#   postgres_db_name = "demoapp"
+# }
+
+# locals {
+#   postgres_user = "demoapp"
+# }
+
+
+# locals {
+#   dns_basename = "${var.project_name}.${data.google_dns_managed_zone.soup.dns_name}"
+# }
+
+# locals {
+#   rehost_mig_domain = "rehost-mig.${local.dns_basename}"
+# }
+
+
+# variable "template_git" {
+#   type = string
+#   default = "https://github.com/thekoma/samesoup-configsync"
+# }
+
+# variable "template_path" {
+#   type = string
+#   default = "."
+# }
+
+# variable "template_path_mainrepo" {
+#   type = string
+#   default = "mainrepo"
+# }

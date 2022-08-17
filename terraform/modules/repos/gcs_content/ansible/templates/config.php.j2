@@ -70,16 +70,16 @@ define('DB_RUN_MIGRATIONS', true);
 define('DB_DRIVER', 'postgres');
 
 // Mysql/Postgres username
-define('DB_USERNAME', '{{postgress_user.stdout}}');
+define('DB_USERNAME', '{{postgres_user.stdout}}');
 
 // Mysql/Postgres password
-define('DB_PASSWORD', '{{postgress_password.stdout}}');
+define('DB_PASSWORD', '{{postgres_password.stdout}}');
 
 // Mysql/Postgres hostname
 define('DB_HOSTNAME', '{{db_host.stdout}}');
 
 // Mysql/Postgres database name
-define('DB_NAME', '{{postgress_db_name.stdout}}');
+define('DB_NAME', '{{postgres_db_name.stdout}}');
 
 // Mysql/Postgres custom port (null = default port)
 define('DB_PORT', null);
