@@ -17,7 +17,7 @@ resource "google_compute_instance" "rehost" {
   }
   boot_disk {
     initialize_params {
-      image = var.image_flavor
+      image = local.image_flavor
       size  = var.boot_disk_size
     }
   }

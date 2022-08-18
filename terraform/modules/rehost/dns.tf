@@ -6,7 +6,7 @@ data "google_dns_managed_zone" "dns_zone" {
 }
 
 locals {
-  rehost_record = "rehost.${var.dns_prefix}.${data.google_dns_managed_zone.dns_zone.dns_name}"
+  rehost_record = "${var.vm_name}.${var.dns_prefix}.${data.google_dns_managed_zone.dns_zone.dns_name}"
 }
 
 resource "google_dns_record_set" "rehost" {

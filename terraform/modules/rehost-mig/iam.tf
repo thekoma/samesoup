@@ -1,32 +1,32 @@
-resource google_service_account "rehost" {
+resource google_service_account "rehost_mig" {
   project       = var.project_id
   account_id    = var.service_account_id
-  display_name  = "Service Account for the rehost VM"
+  display_name  = "Service Account for the rehost_mig VM"
 }
 
-resource "google_project_iam_member" "rehost_object_viewer" {
+resource "google_project_iam_member" "rehost_mig_object_viewer" {
   project = var.project_id
   role    = "roles/storage.objectViewer"
-  member  = "serviceAccount:${google_service_account.rehost.email}"
+  member  = "serviceAccount:${google_service_account.rehost_mig.email}"
 }
 
 resource "google_secret_manager_secret_iam_member" "php_config_secret_id" {
   project   = var.project_id
   secret_id = var.php_config_secret_id
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.rehost.email}"
+  member    = "serviceAccount:${google_service_account.rehost_mig.email}"
 }
 
 resource "google_secret_manager_secret_iam_member" "gcs_repo_url" {
   project   = var.project_id
   secret_id = var.gcs_repo_url_secret_id
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.rehost.email}"
+  member    = "serviceAccount:${google_service_account.rehost_mig.email}"
 }
 
 resource "google_secret_manager_secret_iam_member" "gcs_repo_name" {
   project   = var.project_id
   secret_id = var.gcs_repo_name_secret_id
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.rehost.email}"
+  member    = "serviceAccount:${google_service_account.rehost_mig.email}"
 }

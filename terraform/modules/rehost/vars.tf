@@ -36,6 +36,11 @@ variable "zone" {
   default = "us-central1-a"
 }
 
+variable "region" {
+  type    = string
+  default = "us-central1"
+}
+
 variable "vm_name" {
   type    = string
   default = "rehost"
@@ -46,11 +51,20 @@ variable "machine_type" {
   default = "e2-medium"
 }
 
-variable "image_flavor" {
+variable "image_project" {
   type    = string
-  default = "ubuntu-os-cloud/ubuntu-2204-lts"
+  default = "ubuntu-os-cloud"
 }
 
+
+variable "image_family" {
+  type    = string
+  default = "ubuntu-2204-lts"
+}
+
+locals {
+  image_flavor = "${var.image_project}/${var.image_family}"
+}
 # Boot disk size in GB
 variable "boot_disk_size" {
   type    = string
@@ -116,55 +130,3 @@ variable "dns_prefix" {
   type     = string
   nullable = false
 }
-
-
-
-
-/*
-variable "module_depends_on" {
-  # the value doesn't matter; we're just using this variable
-  # to propagate dependencies.
-  type    = any
-  default = []
-}
-
-
-variable "service_account_id" {
-  type     = string
-  nullable = false
-}
-
-
-variable "region" {
-  type     = string
-  default = "us-central1"
-}
-
-variable "location" {
-  type     = string
-  default = "US"
-}
-
-variable "zones" {
-  type    = list(string)
-  default = [
-    "us-central1-a",
-    "us-central1-b",
-    "us-central1-c"
-  ]
-}
-
-variable "primary-zone" {
-  type    = string
-  default = "us-central1-a"
-}
-
-variable "project_id" {
-  type     = string
-  nullable = false
-}
-
-
-
-
- */

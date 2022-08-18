@@ -88,25 +88,25 @@
         name: nginx
         enabled: true
         state: restarted
-    - name: gather myip
-      tags: [ "always" ]
-      shell: curl -s ipinfo.io |jq -r .ip
-      register: myip
-    - name: "Values decripted"
-      vars:
-        resolved_ip: "{{ lookup( 'community.general.dig', url ) }}"
-      debug:
-        msg: "Public url is {{url}}, that resolve at IP {{ resolved_ip }} and my ip is {{myip.stdout}}"
-    - name: "I'm a standalone server"
-      when:
-        - lookup('community.general.dig', url ) == myip.stdout
-      debug:
-        msg: "I'm going to be a standalone server at {{url}}"
-    - name: "I'm a pool server"
-      when:
-        - not lookup('community.general.dig', url ) == myip.stdout
-      debug:
-        msg: "I'm going to be a pool server at {{url}}"
+    # - name: gather myip
+    #   tags: [ "always" ]
+    #   shell: curl -s ipinfo.io |jq -r .ip
+    #   register: myip
+    # - name: "Values decripted"
+    #   vars:
+    #     resolved_ip: "{{ lookup( 'community.general.dig', url ) }}"
+    #   debug:
+    #     msg: "Public url is {{url}}, that resolve at IP {{ resolved_ip }} and my ip is {{myip.stdout}}"
+    # - name: "I'm a standalone server"
+    #   when:
+    #     - lookup('community.general.dig', url ) == myip.stdout
+    #   debug:
+    #     msg: "I'm going to be a standalone server at {{url}}"
+    # - name: "I'm a pool server"
+    #   when:
+    #     - not lookup('community.general.dig', url ) == myip.stdout
+    #   debug:
+    #     msg: "I'm going to be a pool server at {{url}}"
 
   tasks:
     - name: Adding  Logs
@@ -213,15 +213,6 @@
         group: 'www-data'
         mode: u=rwX,g=rX,o=rX
 
-    # - name: Update the reconfiguration script
-    #   tags: [ "always" ]
-    #   ansible.builtin.template:
-    #     src: config.php.j2
-    #     dest: "/var/www/html/config.php"
-    #     owner: 'www-data'
-    #     group: 'www-data'
-    #     mode: u=rwX,g=rX,o=rX
-
     - name: Delete default config html
       tags: [ "always" ]
       ansible.builtin.file:
@@ -254,7 +245,7 @@
       role: maxhoesel.caddy.caddy_server
       become: true
       when:
-        - lookup('community.general.dig', url ) == myip.stdout
+        - url is defined
       vars:
         caddy_config_mode: "Caddyfile"
         caddy_caddyfile: |
@@ -264,19 +255,19 @@
               output file /var/log/caddy/access.log
             }
 
-    - name: Configuring Caddy for plain catchall
-      role: maxhoesel.caddy.caddy_server
-      become: true
-      when:
-        - not lookup('community.general.dig', url) == myip.stdout
-      vars:
-        caddy_config_mode: "Caddyfile"
-        caddy_caddyfile: |
-            *:80
-            reverse_proxy http://127.0.0.1:8080
-            log {
-              output file /var/log/caddy/access.log
-            }
+    # - name: Configuring Caddy for plain catchall
+    #   role: maxhoesel.caddy.caddy_server
+    #   become: true
+    #   when:
+    #     - not lookup('community.general.dig', url) == myip.stdout
+    #   vars:
+    #     caddy_config_mode: "Caddyfile"
+    #     caddy_caddyfile: |
+    #         *:80
+    #         reverse_proxy http://127.0.0.1:8080
+    #         log {
+    #           output file /var/log/caddy/access.log
+    #         }
 
   post_tasks:
     - name: reload-caddy
@@ -284,3 +275,5 @@
         name: caddy
         state: reloaded
         enabled: true
+      when:
+        - url is defined

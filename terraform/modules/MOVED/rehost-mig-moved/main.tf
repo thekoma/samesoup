@@ -1,21 +1,28 @@
-# # I need a SVC account in IAM that has the right roles to work with the repository
+data "google_service_account" "rehost" {
+  account_id = var.service_account_id
+}
+
+data "google_compute_network" "main-network" {
+  name = var.network
+  project = var.project_id
+}
 
 
-module "rehost_mig_template" {
+# https://raw.githubusercontent.com/tapanbanker/terraform-ansible-gcp/master/main.tf
+module "rehost-mig-template" {
+  service_account = {
+    email  = data.google_service_account.rehost.email
+    scopes = ["compute-ro", "storage-rw", "logging-write", "monitoring-write", "service-control", "service-management", "pubsub", "trace", "cloud-platform"]
+  }
   source               = "terraform-google-modules/vm/google//modules/instance_template"
   version              = "~> 7.8.0"
-  service_account = {
-    email  = google_service_account.rehost_mig.email
-    scopes = var.scopes
-  }
 
-
-  machine_type              = var.machine_type
+  machine_type              = "e2-medium"
   region                    = var.region
   project_id                = var.project_id
-  source_image_project      = var.image_project
-  source_image_family       = var.image_family
-  name_prefix               = var.vm_name_prefix
+  source_image_project      = "ubuntu-os-cloud"
+  source_image_family       = "ubuntu-2204-lts"
+  name_prefix               = "rehost-mig"
   tags                      = var.tags
   network                   = var.network
   subnetwork                = var.subnetwork
@@ -33,26 +40,26 @@ module "rehost_mig_template" {
               local_tmp      = /tmp
         runcmd:
         - mkdir -p /opt/installer/logs
-        - gsutil cp -r ${var.gcs_repo_url} /opt/installer
+        - gsutil cp -r ${var.gcs_ansible_url} /opt/installer
         - ansible-galaxy collection install community.postgresql maxhoesel.caddy community.general
         - ansible-galaxy install googlecloudplatform.google_cloud_ops_agents
-        - ansible-playbook /opt/installer/ansible/rerun.yaml --extra-vars "gcs_repo=${var.gcs_repo_url} php_config_secret_id=${var.php_config_secret_id}"
+        - ansible-playbook /opt/installer/ansible/rerun.yaml
         - sh -c /opt/installer/rerun.sh
       EOT
   }
 }
 
-module "rehost_mig" {
+module "rehost-mig" {
   source              = "terraform-google-modules/vm/google//modules/mig"
   version              = "~> 7.8.0"
-  instance_template   = module.rehost_mig_template.self_link
+  instance_template   = module.rehost-mig-template.self_link
   region              = var.region
   autoscaling_enabled = true
-  min_replicas        = var.min_replicas
-  max_replicas        = var.max_replicas
+  min_replicas        = 1
+  max_replicas        = 2
   project_id          = var.project_id
-  hostname            = var.vm_name
-  health_check_name   = "${var.vm_name}-http"
+  hostname            = "rehost-mig"
+  health_check_name = "rehost-mig-http"
   named_ports = [
     {
     name = "http"
@@ -75,27 +82,18 @@ module "rehost_mig" {
   }
 }
 
-locals {
-  lb_ssl_domains = [
-    local.rehost_record
-  ]
-}
 
-resource "google_compute_address" "rehost_mig_lb" {
-  name = "rehost-mig-lb-ip"
-}
 
-module "mig_lb_https" {
+module "mig-lb-https" {
   source                          = "GoogleCloudPlatform/lb-http/google"
   version                         = "~> 6.3"
-  name                            = "${var.vm_name}-lb"
+  name                            = "mig-lb-https"
   project                         = var.project_id
-  target_tags                     = var.tags
-  firewall_networks               = [ var.network ]
+  target_tags                     = [ data.google_compute_network.main_network.name  ]
+  firewall_networks               = [ data.google_compute_network.main_network.name ]
   ssl                             = true
   use_ssl_certificates            = false
-  managed_ssl_certificate_domains = local.lb_ssl_domains
-  address                         = google_compute_address.rehost_mig_lb.address
+  managed_ssl_certificate_domains = var.lb_ssl_domains
   backends = {
     default = {
       description                     = null
@@ -129,7 +127,7 @@ module "mig_lb_https" {
 
       groups = [
         {
-          group                        = module.rehost_mig.instance_group
+          group                        = module.rehost-mig.instance_group
           balancing_mode               = null
           capacity_scaler              = null
           description                  = null
@@ -150,4 +148,8 @@ module "mig_lb_https" {
       }
     }
   }
+}
+
+output "external_ip" {
+  value = module.mig-lb-https.external_ip
 }

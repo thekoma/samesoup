@@ -4,46 +4,81 @@ variable "module_depends_on" {
   type    = any
   default = []
 }
-variable "network" {
-  type     = string
-}
 
-variable "subnetwork" {
-  type     = string
-  default = "default"
-}
-
-variable "service_account_id" {
+variable "project_id" {
   type     = string
   nullable = false
 }
 
-
-variable "region" {
-  type     = string
-  default = "us-central1"
+variable "service_account_id" {
+  type      = string
+  nullable  = true
+  default   = "rehost-mig"
 }
 
-variable "location" {
-  type     = string
-  default = "US"
-}
-
-variable "zones" {
+variable "scopes" {
   type    = list(string)
   default = [
-    "us-central1-a",
-    "us-central1-b",
-    "us-central1-c"
-  ]
+    "compute-ro",
+    "storage-rw",
+    "logging-write",
+    "monitoring-write",
+    "service-control",
+    "service-management",
+    "pubsub",
+    "trace",
+    "cloud-platform"
+    ]
 }
 
-variable "primary-zone" {
+variable "zone" {
   type    = string
   default = "us-central1-a"
 }
 
-variable "project_id" {
+variable "region" {
+  type    = string
+  default = "us-central1"
+}
+
+variable "vm_name" {
+  type    = string
+  default = "rehost-mig"
+}
+
+variable "vm_name_prefix" {
+  type    = string
+  default = "rehost-mig"
+}
+
+variable "machine_type" {
+  type    = string
+  default = "e2-medium"
+}
+
+variable "image_project" {
+  type    = string
+  default = "ubuntu-os-cloud"
+}
+
+
+variable "image_family" {
+  type    = string
+  default = "ubuntu-2204-lts"
+}
+
+# Boot disk size in GB
+variable "boot_disk_size" {
+  type    = string
+  default = "100"
+}
+
+variable "network" {
+  type     = string
+  nullable = false
+}
+
+variable "subnetwork" {
   type     = string
   nullable = false
 }
@@ -57,14 +92,56 @@ variable "tags" {
   ]
 }
 
-
-variable "gcs_ansible_url" {
+variable "php_config_secret_id" {
   type     = string
   nullable = false
 }
 
 
-variable "lb_ssl_domains" {
-  type     = list(string)
+variable "gcs_repo_url" {
+  type     = string
   nullable = false
+}
+
+variable "gcs_repo_url_secret_id" {
+  type     = string
+  nullable = false
+}
+
+variable "gcs_repo_name" {
+  type     = string
+  nullable = false
+}
+
+variable "gcs_repo_name_secret_id" {
+  type     = string
+  nullable = false
+}
+
+variable "dns_zone" {
+  type     = string
+  nullable = false
+}
+
+variable "dns_project_id" {
+  type     = string
+  nullable = false
+}
+
+variable "dns_prefix" {
+  type     = string
+  nullable = false
+}
+
+
+variable "min_replicas" {
+  type     = number
+  nullable = true
+  default = 1
+}
+
+variable "max_replicas" {
+  type     = number
+  nullable = true
+  default = 3
 }
