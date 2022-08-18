@@ -74,6 +74,28 @@
         - jq
         - curl
         - postgresql-client
+    - name: Upload Size Limit
+      community.general.ini_file:
+        path: /etc/php/8.1/fpm/php.ini
+        section: PHP
+        option: upload_max_filesize
+        value: 200M
+        backup: no
+      notify:
+        - reload-php-fpm
+        - reload-nginx
+
+    - name: Upload Size Limit
+      community.general.ini_file:
+        path: /etc/php/8.1/fpm/php.ini
+        section: PHP
+        option: post_max_size
+        value: 200M
+        backup: no
+      notify:
+        - reload-php-fpm
+        - reload-nginx
+
     - name: Update the reconfiguration script
       tags: [ "always" ]
       ansible.builtin.template:
