@@ -19,7 +19,7 @@ output "explanation" {
   Refactor:   https://replatform.${local.dns_basename}  <- The end of the curve, the application is now only a container as a service in Cloud Run
 
   The credentials are:
-  user: admin
+  user:     admin
   password: admin
 
   Feel free to break it.
