@@ -1,6 +1,9 @@
 output db_hostname {
   value = google_sql_database_instance.app_db.private_ip_address
 }
+output db_connection_name {
+  value = google_sql_database_instance.app_db.connection_name
+}
 output db_username {
   value = var.postgres_user_value
 }

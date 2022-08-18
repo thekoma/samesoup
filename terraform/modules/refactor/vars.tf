@@ -11,7 +11,6 @@ variable "php_config_secret_id" {
 }
 
 
-
 variable "project_id" {
   type     = string
   nullable = false
@@ -22,11 +21,6 @@ variable "network" {
   type     = string
   nullable = false
 }
-variable "subnetwork" {
-  type     = string
-  default = "default"
-}
-
 
 variable "region" {
   type     = string
@@ -34,35 +28,21 @@ variable "region" {
 }
 
 
-variable "ip_range_pods_name" {
+variable "db_connection_name" {
   type     = string
-  default = "pods"
+  nullable = false
 }
 
-variable "ip_range_services_name" {
+variable "image" {
   type     = string
-  default = "svcs"
+  nullable = true
+  default = "kanboard:latest"
 }
 
-variable "subnet_ip" {
+variable "refactor_sa_name" {
   type     = string
-  default = "10.0.0.0/17"
-}
-
-variable "pods_subnet_ip" {
-  type     = string
-  default = "192.168.0.0/18"
-}
-
-variable "svcs_subnet_ip" {
-  type     = string
-  default = "192.168.64.0/18"
-}
-
-
-variable "gke_cluster_name" {
-  type     = string
-  default = "replatform"
+  nullable = true
+  default = "refactor"
 }
 
 locals {
@@ -70,34 +50,18 @@ locals {
   membership_id = "replatform-clusters"
   registry= "${var.region}-docker.pkg.dev/${var.project_id}/${var.project_id}"
   basename = "${var.dns_prefix}.${data.google_dns_managed_zone.dns_zone.dns_name}"
+  container_image = "${local.registry}/${var.image}"
 }
 
-variable "sync_branch" {
-  type = string
-  nullable = true
-  default = "master"
+variable "connector_cidr" {
+  type     = string
+  description = "Network to connect to db from CloudRun"
+  default = "10.8.0.0/28"
 }
-
-variable "kanboard_sa" {
-  type = string
-  default = "kanboard"
+variable "connector_name" {
+  type     = string
+  default = "refactor"
 }
-
-variable "template_git" {
-  type = string
-  default = "https://github.com/thekoma/samesoup-configsync"
-}
-
-variable "template_path" {
-  type = string
-  default = "./"
-}
-
-variable "ansible_config_path" {
-  type = string
-  default = "mainrepo"
-}
-
 
 variable "dns_project_id" {
   type = string

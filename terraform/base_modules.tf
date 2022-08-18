@@ -81,3 +81,16 @@ module "replatform" {
   dns_prefix              = var.dns_prefix
   module_depends_on       = [ module.project-factory, module.network, module.policies ]
 }
+
+module "refactor" {
+  source                  = "./modules/refactor"
+  project_id              = local.project_id
+  region                  = var.region
+  network                 = module.network.main_network_name
+  php_config_secret_id    = module.repos.php_config_secret_id
+  db_connection_name      = module.database.db_connection_name
+  dns_zone                = var.dns_zone
+  dns_project_id          = var.dns_project_id
+  dns_prefix              = var.dns_prefix
+  module_depends_on       = [ module.project-factory, module.network, module.policies ]
+}
