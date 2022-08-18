@@ -5,15 +5,11 @@
     template_path: "{{ lookup('ansible.builtin.env', 'TEMPLATE_PATH', default=Undefined)}}"
     project_git: "{{ lookup('ansible.builtin.env', 'PROJECT_GIT', default=Undefined)}}"
     project_id: "{{ lookup('ansible.builtin.env', 'PROJECT_ID', default=Undefined)}}"
-    repo_sa: "{{ lookup('ansible.builtin.env', 'REPO_SA', default=Undefined)}}"
-    custom_metrics_sa: "{{ lookup('ansible.builtin.env', 'CUSTOM_METRICS_SA', default=Undefined)}}"
-    external_secret_path: "{{ lookup('ansible.builtin.env', 'EXTERNAL_SECRET_PATH', default='secondary/external-secrets')}}"
-    external_kanboard_path: "{{ lookup('ansible.builtin.env', 'EXTERNAL_KANBOARD_PATH', default='secondary/kanboard')}}"
     kanboard_sa: "{{ lookup('ansible.builtin.env', 'KANBOARD_SA', default=Undefined)}}"
     ssl_domain: "{{ lookup('ansible.builtin.env', 'SSL_DOMAIN', default=Undefined)}}"
     kanboard_image: "{{ lookup('ansible.builtin.env', 'KANBOARD_IMAGE', default=Undefined)}}"
     kanboard_tag: "{{ lookup('ansible.builtin.env', 'KANBOARD_TAG', default='latest')}}"
-
+    secret_id: "{{ lookup('ansible.builtin.env', 'SECRET_ID', default='latest')}}"
 
   tasks:
     - name: Create temporary build directory

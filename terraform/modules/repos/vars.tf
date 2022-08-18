@@ -18,6 +18,13 @@ variable "location" {
 }
 
 
+variable "region" {
+  type    = string
+  nullable = true
+  default = "us-central1"
+}
+
+
 variable "postgres_password" {
   type = string
   nullable = false

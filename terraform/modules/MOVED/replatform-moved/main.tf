@@ -8,7 +8,7 @@ terraform {
     }
   }
 }
-data "google_client_config" "default" {}
+
 provider "kubernetes" {
   host                   = "https://${module.gke.endpoint}"
   token                  = data.google_client_config.default.access_token
@@ -20,4 +20,14 @@ data "google_project" "project" {
 
 data "google_client_openid_userinfo" "self" {
 }
+data "google_compute_network" "main_network" {
+  name = var.network_name
+  project = var.project_id
+}
 
+data "google_client_config" "default" {}
+
+
+data "google_service_account" "replatform" {
+  account_id = var.kanboard_sa_name_id
+}

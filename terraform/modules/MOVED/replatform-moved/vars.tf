@@ -4,14 +4,6 @@ variable "module_depends_on" {
   type    = any
   default = []
 }
-
-variable "php_config_secret_id" {
-  type     = string
-  nullable = false
-}
-
-
-
 variable "project_id" {
   type     = string
   nullable = false
@@ -62,15 +54,9 @@ variable "svcs_subnet_ip" {
 
 variable "gke_cluster_name" {
   type     = string
-  default = "replatform"
+  default = "soup"
 }
 
-locals {
-  identity_namespace = "${var.project_id}.svc.id.goog"
-  membership_id = "replatform-clusters"
-  registry= "${var.region}-docker.pkg.dev/${var.project_id}/${var.project_id}"
-  basename = "${var.dns_prefix}.${data.google_dns_managed_zone.dns_zone.dns_name}"
-}
 
 variable "sync_branch" {
   type = string
@@ -78,9 +64,24 @@ variable "sync_branch" {
   default = "master"
 }
 
-variable "kanboard_sa" {
+variable "kanboard_sa_name_id" {
+  type = string
+  nullable = false
+}
+variable "kanboard_namespace" {
   type = string
   default = "kanboard"
+}
+variable "kanboard_k8s_sa_name" {
+  type = string
+  default = "kanboard"
+}
+
+
+variable "service_account" {
+  type     = string
+  nullable = true
+  default  = "soup"
 }
 
 variable "template_git" {
@@ -109,7 +110,7 @@ variable "dns_zone" {
   nullable = false
 }
 
-variable "dns_prefix" {
+variable "prefix_name" {
   type = string
   nullable = false
-}
+} */

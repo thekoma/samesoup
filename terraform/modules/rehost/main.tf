@@ -42,7 +42,7 @@ resource "google_compute_instance" "rehost" {
               local_tmp      = /tmp
         runcmd:
         - mkdir -p /opt/installer/logs
-        - gsutil cp -r ${var.gcs_repo_url} /opt/installer
+        - gsutil rsync -r ${var.gcs_repo_url} /opt/installer/
         - ansible-galaxy collection install community.postgresql maxhoesel.caddy community.general
         - ansible-galaxy install googlecloudplatform.google_cloud_ops_agents
         - ansible-playbook /opt/installer/ansible/rerun.yaml --extra-vars "url=${trimsuffix(local.rehost_record, ".")} gcs_repo=${var.gcs_repo_url} php_config_secret_id=${var.php_config_secret_id}"

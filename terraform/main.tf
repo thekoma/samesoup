@@ -69,7 +69,7 @@ module "project-factory" {
 #   module_depends_on       = [ module.policies, google_sql_database.app-db, google_storage_bucket.utils, google_compute_network.main_network ]
 #   template_git            = var.template_git
 #   template_path           = var.template_path
-#   template_path_mainrepo  = var.template_path_mainrepo
+#   ansible_config_path  = var.ansible_config_path
 #   kanboard_sa_name_id     = google_service_account.replatform.id
 #   dns_zone                = var.dns_zone
 #   dns_project_id          = var.dns_project_id

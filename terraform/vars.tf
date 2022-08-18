@@ -125,7 +125,7 @@ variable "dns_prefix" {
 #   default = "."
 # }
 
-# variable "template_path_mainrepo" {
+# variable "ansible_config_path" {
 #   type = string
 #   default = "mainrepo"
 # }

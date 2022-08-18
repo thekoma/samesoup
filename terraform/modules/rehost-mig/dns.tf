@@ -16,5 +16,5 @@ resource "google_dns_record_set" "rehost-mig" {
   managed_zone  = data.google_dns_managed_zone.dns_zone.name
   type          = "A"
   ttl           = 300
-  rrdatas       = [ google_compute_address.rehost_mig_lb.address ]
+  rrdatas       = [ module.mig_lb_https.external_ip ]
 }
