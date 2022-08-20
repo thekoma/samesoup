@@ -13,7 +13,7 @@ provider "google-beta" {
 
 module "project-factory" {
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 13.0.0"
+  version = "~> 13.1.0"
   name                 = var.project_name
   folder_id            = var.folder_id
   project_id           = local.project_id
